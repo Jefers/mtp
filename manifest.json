@@ -1,0 +1,58 @@
+{
+  "name": "MotorTrip Calc",
+  "short_name": "MotorTrip",
+  "description": "Motorbike Camping Cost Estimator",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#0a0a0a",
+  "theme_color": "#3b82f6",
+  "categories": ["lifestyle", "travel", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/iphone-screenshot.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "MotorTrip Calculator on iPhone"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Trip",
+      "short_name": "New",
+      "description": "Create a new trip calculation",
+      "url": "/?new=true",
+      "icons": [{ "src": "icons/shortcut-new.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "History",
+      "short_name": "History",
+      "description": "View trip history",
+      "url": "/#history",
+      "icons": [{ "src": "icons/shortcut-history.png", "sizes": "96x96" }]
+    }
+  ]
+}
