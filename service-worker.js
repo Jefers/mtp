@@ -1,15 +1,16 @@
 const CACHE_NAME = 'motortrip-cache-v1';
-const OFFLINE_URL = 'offline.html';
+const OFFLINE_URL = '/mtp/offline.html';
+const BASE_PATH = '/mtp/';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
-  './',
-  './index.html',
-  './offline.html',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/apple-icon.png',
-  './icons/favicon.ico',
+  '/mtp/',
+  '/mtp/index.html',
+  '/mtp/offline.html',
+  '/mtp/icons/icon-192.png',
+  '/mtp/icons/icon-512.png',
+  '/mtp/icons/apple-icon.png',
+  '/mtp/icons/favicon.ico',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   // Font Awesome font files
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2',
@@ -61,11 +62,13 @@ self.addEventListener('activate', event => {
 // Fetch event - Cache First, Network Fallback strategy
 self.addEventListener('fetch', event => {
   // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin) && 
-      !event.request.url.includes('cdnjs.cloudflare.com')) {
-    return;
-  }
+const requestUrl = new URL(event.request.url);
   
+// Only handle requests within our /mtp/ scope or external CDN
+if (!requestUrl.pathname.startsWith('/mtp/') && 
+    !requestUrl.href.includes('cdnjs.cloudflare.com')) {
+  return;
+}  
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
     return;
@@ -131,7 +134,7 @@ self.addEventListener('fetch', event => {
             // If the resource is not cached and network fails,
             // and it's an image, return a placeholder
             if (event.request.destination === 'image') {
-              return caches.match('./icons/icon-512.png');
+            return caches.match('/mtp/icons/icon-512.png');
             }
             
             // For Font Awesome fonts, we already precached them
