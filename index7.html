@@ -91,7 +91,7 @@
             --border-color: var(--border-color-light);
         }
 
-        /* Animated motorcycle icon */
+        /* Animated motorcycle icon (added for fun) */
         @keyframes motorcycle-move {
             0%, 100% { transform: translateX(0) rotate(0deg); }
             25% { transform: translateX(5px) rotate(5deg); }
@@ -204,7 +204,7 @@
         .card-glow-wrapper::after {
             content: '';
             position: absolute;
-            pointer-events: none;
+            pointer-events: none;  /* ensure they don't block clicks */
             border-radius: calc(var(--border-radius-card) + 4px);
             z-index: var(--z-background);
             animation: rotate 4s linear infinite;
@@ -265,7 +265,7 @@
             overflow: hidden;
         }
 
-        /* Total Display - with map icon */
+        /* Total Display */
         .total-display {
             text-align: center;
             margin-bottom: var(--spacing-xl);
@@ -276,20 +276,6 @@
             font-size: 1.1rem;
             color: var(--secondary-text);
             margin-bottom: var(--spacing-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .map-icon {
-            color: var(--accent-color);
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: transform 0.2s;
-        }
-        .map-icon:hover {
-            transform: scale(1.2);
         }
 
         .total-amount {
@@ -356,7 +342,7 @@
             font-size: 16px;
         }
 
-        /* Predefined Trips Selector */
+        /* Predefined Trips Selector (added) */
         .predefined-trips-group {
             margin: var(--spacing-lg) 0;
             padding: var(--spacing-md) 0;
@@ -738,42 +724,7 @@
             border-color: var(--accent-color);
         }
 
-        /* Map Modal (new) */
-        .map-modal-content {
-            max-width: 700px;
-            width: 95%;
-        }
-        .map-container {
-            width: 100%;
-            height: 400px;
-            margin: 15px 0;
-            border-radius: var(--border-radius-input);
-            overflow: hidden;
-            background: var(--tertiary-bg);
-        }
-        .map-container iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-        .rating-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-            padding: 10px;
-            background: var(--tertiary-bg);
-            border-radius: var(--border-radius-button);
-        }
-        .rating-stars {
-            color: #ffc107;
-            letter-spacing: 2px;
-        }
-        .review-count {
-            color: var(--secondary-text);
-        }
-
-        /* Copy Modal */
+        /* Copy Modal (added) */
         .copy-modal {
             position: fixed;
             top: 0;
@@ -998,8 +949,7 @@
             
             .btn:hover, .btn:active,
             .info-icon:hover,
-            .history-item:hover,
-            .map-icon:hover {
+            .history-item:hover {
                 transform: none !important;
             }
             
@@ -1027,12 +977,9 @@
         <!-- Main Calculator Card with Glowing Border -->
         <div class="card-glow-wrapper">
             <div class="card-glow">
-                <!-- Total Display with map icon -->
+                <!-- Total Display -->
                 <div class="total-display">
-                    <div class="total-label">
-                        Total Trip Cost
-                        <i class="fas fa-map-marked-alt map-icon" id="mapIcon" title="Show on map"></i>
-                    </div>
+                    <div class="total-label">Total Trip Cost</div>
                     <div class="total-amount" id="totalAmount">₱ 0</div>
                     <div class="total-details">
                         <span id="perPerson">Per Person: ₱ 0</span>
@@ -1054,7 +1001,7 @@
                     </div>
                 </div>
 
-                <!-- Predefined Trips Selector -->
+                <!-- Predefined Trips Selector (added) -->
                 <div class="predefined-trips-group">
                     <label for="tripSelect">Load a sample camping trip:</label>
                     <div class="trip-select-row">
@@ -1288,30 +1235,7 @@
         </div>
     </div>
 
-    <!-- Map Modal (new) -->
-    <div class="modal-overlay" id="mapModal">
-        <div class="modal map-modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-map-marked-alt"></i> <span id="mapLocationName">Location</span></h2>
-                <button class="close-modal" id="closeMapModalBtn">&times;</button>
-            </div>
-            <div class="map-container" id="mapContainer">
-                <!-- iframe will be inserted here -->
-            </div>
-            <div class="rating-info" id="ratingInfo" style="display: none;">
-                <span class="rating-stars" id="ratingStars"></span>
-                <span class="review-count" id="reviewCount"></span>
-            </div>
-            <p style="color: var(--secondary-text); text-align: center; margin-top: 10px;">
-                <small>Coordinates: <span id="mapCoords"></span></small>
-            </p>
-            <div class="button-group">
-                <button type="button" class="btn btn-secondary" id="closeMapModalBtn2">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Copy Modal -->
+    <!-- Copy Modal (added) -->
     <div class="copy-modal" id="copyModal">
         <div class="copy-modal-content">
             <div class="modal-header">
@@ -1402,97 +1326,16 @@
         history: []
     };
 
-    // Current trip coordinates (if known)
-    let currentTrip = {
-        lat: null,
-        lon: null,
-        name: 'Tanay, Rizal',
-        rating: null,
-        reviews: null
-    };
-
-    // ---------- SAMPLE TRIPS with coordinates and ratings ----------
+    // ---------- SAMPLE TRIPS (easily modifiable) ----------
     const sampleTrips = [
-        { 
-            name: "River Ranch PH (Tanay)", 
-            campsiteFee: 800, 
-            foodCost: 150, 
-            environmentalFee: 0,
-            lat: 14.6548,
-            lon: 121.3411,
-            rating: 4.7,
-            reviews: 74
-        },
-        { 
-            name: "Bulod Campsite (Daraitan, Tanay)", 
-            campsiteFee: 300, 
-            foodCost: 150, 
-            environmentalFee: 0,
-            lat: 14.6111,
-            lon: 121.4172,
-            rating: null,
-            reviews: null
-        },
-        { 
-            name: "Camp Irog Daraitan (Tanay)", 
-            campsiteFee: 400, 
-            foodCost: 150, 
-            environmentalFee: 0,
-            lat: 14.6067,
-            lon: 121.4285,
-            rating: 5.0,
-            reviews: 23
-        },
-        { 
-            name: "Daranak/Batlag Falls area (Tanay)", 
-            campsiteFee: 400, 
-            foodCost: 150, 
-            environmentalFee: 50,
-            lat: 14.5450,   // LF Campsite approx
-            lon: 121.2950,
-            rating: 4.4,
-            reviews: 1300
-        },
-        { 
-            name: "Atburan Camping Ground (Tanay)", 
-            campsiteFee: 300, 
-            foodCost: 150, 
-            environmentalFee: 0,
-            lat: 14.6425,
-            lon: 121.4350,
-            rating: null,
-            reviews: null
-        },
-        { 
-            name: "Luklukan Camp and Chill (Tanay)", 
-            campsiteFee: 400, 
-            foodCost: 150, 
-            environmentalFee: 0,
-            lat: 14.5886,
-            lon: 121.3325,
-            rating: 4.9,
-            reviews: 18
-        },
-        { 
-            name: "Blessed HM Campsite (Tanay)", 
-            campsiteFee: 500, 
-            foodCost: 150, 
-            environmentalFee: 0,
-            lat: 14.6083,
-            lon: 121.3283,
-            rating: 5.0,
-            reviews: 1
-        },
-        { 
-            name: "Camp Majai Riverfront (Tanay)", 
-            campsiteFee: 400, 
-            foodCost: 150, 
-            environmentalFee: 0,
-            lat: 14.6317,
-            lon: 121.3450,
-            rating: 4.9,
-            reviews: 10
-        }
+        { name: "River Ranch PH (Tanay)", campsiteFee: 800, foodCost: 150, environmentalFee: 0 },
+        { name: "Bulod Campsite (Daraitan, Tanay)", campsiteFee: 300, foodCost: 150, environmentalFee: 0 },
+        { name: "Camp Irog Daraitan (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 0 },
+        { name: "Daranak/Batlag Falls area (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 50 },
+        { name: "Atburan Camping Ground (Tanay)", campsiteFee: 300, foodCost: 150, environmentalFee: 0 },
+        { name: "Luklukan Camp and Chill (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 0 },
+        { name: "Blessed HM Campsite (Tanay)", campsiteFee: 500, foodCost: 150, environmentalFee: 0 },
+        { name: "Camp Majai Riverfront (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 0 }
     ];
 
     // DOM Elements
@@ -1501,10 +1344,8 @@
     const saveBtn = document.getElementById('saveBtn');
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
     const settingsModal = document.getElementById('settingsModal');
-    const mapModal = document.getElementById('mapModal');
     const copyModal = document.getElementById('copyModal');
     const closeModalBtns = document.querySelectorAll('#closeModalBtn, #closeModalBtn2');
-    const closeMapModalBtns = document.querySelectorAll('#closeMapModalBtn, #closeMapModalBtn2');
     const closeCopyModalBtns = document.querySelectorAll('#closeCopyModalBtn, #closeCopyModalBtn2');
     const applySettingsBtn = document.getElementById('applySettingsBtn');
     const copyToClipboardBtn = document.getElementById('copyToClipboardBtn');
@@ -1533,15 +1374,6 @@
 
     const tripSelect = document.getElementById('tripSelect');
     const loadTripBtn = document.getElementById('loadTripBtn');
-
-    // Map elements
-    const mapIcon = document.getElementById('mapIcon');
-    const mapLocationName = document.getElementById('mapLocationName');
-    const mapContainer = document.getElementById('mapContainer');
-    const ratingInfo = document.getElementById('ratingInfo');
-    const ratingStars = document.getElementById('ratingStars');
-    const reviewCount = document.getElementById('reviewCount');
-    const mapCoords = document.getElementById('mapCoords');
 
     // Initialize the app
     function init() {
@@ -1594,64 +1426,8 @@
         tentRentalInput.value = 0;
         parkingFeeInput.value = 0;
         miscCostInput.value = 0;
-        
-        // Update current trip coordinates
-        currentTrip = {
-            lat: trip.lat,
-            lon: trip.lon,
-            name: trip.name,
-            rating: trip.rating,
-            reviews: trip.reviews
-        };
-        
         calculateTotal();
         showToast(`Loaded "${trip.name}"`);
-    }
-
-    // Show map modal with current coordinates
-    function showMap() {
-        let lat = currentTrip.lat;
-        let lon = currentTrip.lon;
-        let name = currentTrip.name;
-
-        // If no coordinates, default to Tanay town center
-        if (!lat || !lon) {
-            lat = 14.5869;
-            lon = 121.2844;
-            name = 'Tanay, Rizal (default)';
-        }
-
-        // Build Google Maps embed URL
-        const mapUrl = `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${lat},${lon}`;
-        // Note: Replace YOUR_API_KEY with a valid Google Maps API key. For demo, we use a placeholder.
-        // In production, you'd need to register for a key. Alternatively, use OpenStreetMap iframe.
-        // For now, we'll use OpenStreetMap (no key required) via a static map or embed.
-        // Actually, OpenStreetMap doesn't have an easy embed. Let's use a free tile service: 
-        // We'll use a static map image from a free service? Better: use iframe with Google Maps without key? That won't work.
-        // To keep it simple, we'll use a link to Google Maps instead of an iframe.
-        // But the user wants a popup with map. We can use a static image from a free API like MapKit.
-        // Since we don't have a key, we'll use a placeholder that says "Map view requires API key". 
-        // In a real app, you'd get a key. I'll use a simple iframe with OpenStreetMap's embed (which works without key).
-        
-        // OpenStreetMap iframe example:
-        const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.01}%2C${lat-0.01}%2C${lon+0.01}%2C${lat+0.01}&layer=mapnik&marker=${lat}%2C${lon}`;
-        
-        mapContainer.innerHTML = `<iframe src="${osmUrl}" style="width:100%; height:100%; border:0" allowfullscreen></iframe>`;
-        mapLocationName.textContent = name;
-        mapCoords.textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-
-        // Show rating if available
-        if (currentTrip.rating) {
-            ratingInfo.style.display = 'flex';
-            const fullStars = Math.floor(currentTrip.rating);
-            const halfStar = currentTrip.rating % 1 >= 0.5 ? '½' : '';
-            ratingStars.innerHTML = '★'.repeat(fullStars) + halfStar;
-            reviewCount.textContent = `(${currentTrip.reviews} reviews)`;
-        } else {
-            ratingInfo.style.display = 'none';
-        }
-
-        toggleModal(mapModal, true);
     }
 
     function setupEventListeners() {
@@ -1660,8 +1436,6 @@
         settingsBtn.addEventListener('click', () => toggleModal(settingsModal, true));
         closeModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(settingsModal, false)));
         applySettingsBtn.addEventListener('click', applySettings);
-        
-        closeMapModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(mapModal, false)));
         
         closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
         copyToClipboardBtn.addEventListener('click', copyToClipboard);
@@ -1679,18 +1453,11 @@
             if (e.target === settingsModal) toggleModal(settingsModal, false);
         });
         
-        mapModal.addEventListener('click', (e) => {
-            if (e.target === mapModal) toggleModal(mapModal, false);
-        });
-        
         copyModal.addEventListener('click', (e) => {
             if (e.target === copyModal) toggleModal(copyModal, false);
         });
 
         loadTripBtn.addEventListener('click', loadSampleTrip);
-
-        // Map icon click
-        mapIcon.addEventListener('click', showMap);
     }
 
     function toggleTheme() {
@@ -1847,12 +1614,7 @@
             ...tripData,
             currency: state.currency,
             decimals: state.decimals,
-            savedAt: new Date().toISOString(),
-            // Optionally save coordinates if from sample trip
-            lat: currentTrip.lat,
-            lon: currentTrip.lon,
-            rating: currentTrip.rating,
-            reviews: currentTrip.reviews
+            savedAt: new Date().toISOString()
         };
         state.history.unshift(historyItem);
         saveHistory();
@@ -1926,16 +1688,6 @@
         state.fuelEfficiency = trip.fuelEfficiency;
         if (trip.currency) state.currency = trip.currency;
         if (trip.decimals !== undefined) state.decimals = trip.decimals;
-        
-        // Restore coordinates if available
-        currentTrip = {
-            lat: trip.lat || null,
-            lon: trip.lon || null,
-            name: trip.description,
-            rating: trip.rating || null,
-            reviews: trip.reviews || null
-        };
-        
         calculateTotal();
         showToast(`"${trip.description}" loaded from history`);
     }
