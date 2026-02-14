@@ -93,6 +93,30 @@
             --border-color: var(--border-color-light);
         }
 
+        /* Extreme liquid morphing 
+        @keyframes blob {
+            0%, 100% { 
+                border-radius: 40% 60% 50% 50%; 
+                transform: scaleX(1) scaleY(1) rotate(0deg) translate(0, 0); 
+            }
+            20% { 
+                border-radius: 20% 80% 60% 40%; 
+                transform: scaleX(1.8) scaleY(0.4) rotate(45deg) translate(50px, -30px); 
+            }
+            40% { 
+                border-radius: 80% 20% 40% 60%; 
+                transform: scaleX(0.3) scaleY(2.2) rotate(-30deg) translate(-40px, 50px); 
+            }
+            60% { 
+                border-radius: 30% 70% 80% 20%; 
+                transform: scaleX(1.4) scaleY(0.6) rotate(20deg) translate(30px, 40px); 
+            }
+            80% { 
+                border-radius: 70% 30% 30% 70%; 
+                transform: scaleX(0.6) scaleY(1.5) rotate(-40deg) translate(-50px, -20px); 
+            }
+        }*/
+
         /* Animated motorcycle icon */
         @keyframes motorcycle-move {
             0%, 100% { 
@@ -246,7 +270,7 @@
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
-            font-size: 2.2rem;
+            font-size: 2.2rem; /* Bigger font as requested */
             font-weight: 800;
             color: var(--accent-color);
         }
@@ -447,45 +471,6 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Predefined Trips Selector - NEW */
-        .predefined-trips-group {
-            margin: var(--spacing-lg) 0;
-            padding: var(--spacing-md) 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .predefined-trips-group label {
-            display: block;
-            margin-bottom: var(--spacing-sm);
-            color: var(--secondary-text);
-            font-weight: 500;
-        }
-
-        .trip-select-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .trip-select-row select {
-            flex: 1;
-            padding: 14px 16px;
-            background: var(--tertiary-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-input);
-            color: var(--primary-text);
-            font-size: 16px;
-            backdrop-filter: blur(5px);
-            cursor: pointer;
-        }
-
-        .trip-select-row button {
-            width: auto;
-            padding: 14px 20px;
-            white-space: nowrap;
-        }
-
         /* Input Form */
         .form-group {
             margin-bottom: var(--spacing-lg);
@@ -673,7 +658,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
-        /* Settings Modal (unchanged) */
+        /* Settings Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1159,19 +1144,6 @@
                     </div>
                 </div>
 
-                <!-- NEW: Predefined Trips Selector -->
-                <div class="predefined-trips-group">
-                    <label for="tripSelect">Load a predefined Tanay trip:</label>
-                    <div class="trip-select-row">
-                        <select id="tripSelect" class="form-control">
-                            <option value="">-- Select a campsite --</option>
-                        </select>
-                        <button type="button" class="btn btn-secondary" id="loadTripBtn">
-                            <i class="fas fa-download"></i> Load
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Input Form -->
                 <form id="tripForm">
                     <!-- Trip Details -->
@@ -1417,6 +1389,7 @@
         <span id="toastMessage">Trip saved successfully!</span>
     </div>
 
+    <!-- Everything from .blobs-layer to the end of the script stays exactly the same -->
     <!-- PWA Installation Prompt (optional) -->
     <div id="installPrompt" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--secondary-bg); color: var(--primary-text); padding: 15px; border-radius: var(--border-radius-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10000; border: 1px solid var(--border-color); backdrop-filter: blur(10px);">
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1481,403 +1454,301 @@
         // You could show iOS-specific instructions here
     }
 
-    // ---------- APP STATE ----------
-    const state = {
-        currency: '₱',
-        decimals: 0,
-        fuelEfficiency: 40, // km/L
-        history: []
-    };
+    // App State
+        const state = {
+            currency: '₱',
+            decimals: 0,
+            fuelEfficiency: 40, // km/L
+            history: []
+        };
 
-    // ---------- PREDEFINED TRIPS (from your list) ----------
-    const predefinedTrips = [
-        {
-            name: "River Ranch PH (Barangay Cayabu, Tanay)",
-            campsiteFee: 800,
-            foodCost: 150,
-            environmentalFee: 0,
-            description: "Remote valley in Sierra Madre mountains with direct river access"
-        },
-        {
-            name: "Bulod Campsite (Daraitan, Tanay)",
-            campsiteFee: 300,
-            foodCost: 150,
-            environmentalFee: 0
-        },
-        {
-            name: "Camp Irog Daraitan (across Agos River, Daraitan, Tanay)",
-            campsiteFee: 400,
-            foodCost: 150,
-            environmentalFee: 0
-        },
-        {
-            name: "Daranak/Batlag Falls area campsites (Tanay, near the falls)",
-            campsiteFee: 400,
-            foodCost: 150,
-            environmentalFee: 50      // entrance to falls
-        },
-        {
-            name: "Atburan Camping Ground (Sitio Atburan, Tanay)",
-            campsiteFee: 300,
-            foodCost: 150,
-            environmentalFee: 0
-        },
-        {
-            name: "Luklukan Camp and Chill (Tanay)",
-            campsiteFee: 400,
-            foodCost: 150,
-            environmentalFee: 0
-        },
-        {
-            name: "Blessed HM Campsite (Brgy. Laiban, Tanay)",
-            campsiteFee: 500,
-            foodCost: 150,
-            environmentalFee: 0
-        },
-        {
-            name: "Camp Majai Riverfront (Tanay area)",
-            campsiteFee: 400,
-            foodCost: 150,
-            environmentalFee: 0
-        }
-    ];
-
-    // DOM Elements
-    const themeToggle = document.getElementById('themeToggle');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-    const settingsModal = document.getElementById('settingsModal');
-    const copyModal = document.getElementById('copyModal');
-    const closeModalBtns = document.querySelectorAll('#closeModalBtn, #closeModalBtn2');
-    const closeCopyModalBtns = document.querySelectorAll('#closeCopyModalBtn, #closeCopyModalBtn2');
-    const applySettingsBtn = document.getElementById('applySettingsBtn');
-    const copyToClipboardBtn = document.getElementById('copyToClipboardBtn');
-    const currencyBtns = document.querySelectorAll('.currency-btn');
-    const decimalBtns = document.querySelectorAll('.decimal-btn');
-    const totalAmount = document.getElementById('totalAmount');
-    const perPerson = document.getElementById('perPerson');
-    const perPair = document.getElementById('perPair');
-    const historyList = document.getElementById('historyList');
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
-    const copyText = document.getElementById('copyText');
-    
-    // Input Elements
-    const tripDescriptionInput = document.getElementById('tripDescription');
-    const tripDateInput = document.getElementById('tripDate');
-    const distanceInput = document.getElementById('distance');
-    const fuelPriceInput = document.getElementById('fuelPrice');
-    const campsiteFeeInput = document.getElementById('campsiteFee');
-    const tentRentalInput = document.getElementById('tentRental');
-    const parkingFeeInput = document.getElementById('parkingFee');
-    const environmentalFeeInput = document.getElementById('environmentalFee');
-    const foodCostInput = document.getElementById('foodCost');
-    const miscCostInput = document.getElementById('miscCost');
-    const fuelEfficiencyInput = document.getElementById('fuelEfficiency');
-
-    // NEW: Trip selector elements
-    const tripSelect = document.getElementById('tripSelect');
-    const loadTripBtn = document.getElementById('loadTripBtn');
-
-    // Initialize the app
-    function init() {
-        // Populate the trip dropdown
-        populateTripSelect();
-
-        // Set default date to today
-        const today = new Date();
-        tripDateInput.value = today.toISOString().split('T')[0];
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const copyModal = document.getElementById('copyModal');
+        const closeModalBtns = document.querySelectorAll('#closeModalBtn, #closeModalBtn2');
+        const closeCopyModalBtns = document.querySelectorAll('#closeCopyModalBtn, #closeCopyModalBtn2');
+        const applySettingsBtn = document.getElementById('applySettingsBtn');
+        const copyToClipboardBtn = document.getElementById('copyToClipboardBtn');
+        const currencyBtns = document.querySelectorAll('.currency-btn');
+        const decimalBtns = document.querySelectorAll('.decimal-btn');
+        const totalAmount = document.getElementById('totalAmount');
+        const perPerson = document.getElementById('perPerson');
+        const perPair = document.getElementById('perPair');
+        const historyList = document.getElementById('historyList');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const copyText = document.getElementById('copyText');
         
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
+        // Input Elements
+        const tripDescriptionInput = document.getElementById('tripDescription');
+        const tripDateInput = document.getElementById('tripDate');
+        const distanceInput = document.getElementById('distance');
+        const fuelPriceInput = document.getElementById('fuelPrice');
+        const campsiteFeeInput = document.getElementById('campsiteFee');
+        const tentRentalInput = document.getElementById('tentRental');
+        const parkingFeeInput = document.getElementById('parkingFee');
+        const environmentalFeeInput = document.getElementById('environmentalFee');
+        const foodCostInput = document.getElementById('foodCost');
+        const miscCostInput = document.getElementById('miscCost');
+        const fuelEfficiencyInput = document.getElementById('fuelEfficiency');
+
+        // Initialize the app
+        function init() {
+            // Set default date to today
+            const today = new Date();
+            tripDateInput.value = today.toISOString().split('T')[0];
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                updateThemeToggle();
+            }
+            
+            // Load settings
+            loadSettings();
+            
+            // Load history
+            loadHistory();
+            
+            // Calculate initial total
+            calculateTotal();
+            
+            // Set up event listeners
+            setupEventListeners();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Settings modal
+            settingsBtn.addEventListener('click', () => toggleModal(settingsModal, true));
+            closeModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(settingsModal, false)));
+            applySettingsBtn.addEventListener('click', applySettings);
+            
+            // Copy modal
+            closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
+            copyToClipboardBtn.addEventListener('click', copyToClipboard);
+            
+            // Currency selection
+            currencyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currencyBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            
+            // Decimal selection
+            decimalBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    decimalBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            
+            // Save trip
+            saveBtn.addEventListener('click', saveTrip);
+            
+            // Clear history
+            clearHistoryBtn.addEventListener('click', clearHistory);
+            
+            // Input changes
+            const inputs = document.querySelectorAll('.form-control, .trip-description-input, .date-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateTotal);
+                input.addEventListener('change', calculateTotal);
+            });
+            
+            // Close modal on overlay click
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) {
+                    toggleModal(settingsModal, false);
+                }
+            });
+            
+            copyModal.addEventListener('click', (e) => {
+                if (e.target === copyModal) {
+                    toggleModal(copyModal, false);
+                }
+            });
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLightMode = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
             updateThemeToggle();
         }
-        
-        // Load settings
-        loadSettings();
-        
-        // Load history
-        loadHistory();
-        
-        // Calculate initial total
-        calculateTotal();
-        
-        // Set up event listeners
-        setupEventListeners();
-    }
 
-    // Populate the predefined trips dropdown
-    function populateTripSelect() {
-        predefinedTrips.forEach(trip => {
-            const option = document.createElement('option');
-            option.value = trip.name;
-            option.textContent = trip.name;
-            tripSelect.appendChild(option);
-        });
-    }
-
-    // Load selected predefined trip into the form
-    function loadPredefinedTrip() {
-        const selectedName = tripSelect.value;
-        if (!selectedName) {
-            showToast('Please select a trip');
-            return;
-        }
-        const trip = predefinedTrips.find(t => t.name === selectedName);
-        if (!trip) return;
-
-        // Set description
-        tripDescriptionInput.value = trip.name;
-
-        // Set camping & food fields from trip data
-        campsiteFeeInput.value = trip.campsiteFee;
-        foodCostInput.value = trip.foodCost;
-        environmentalFeeInput.value = trip.environmentalFee;
-
-        // Reset fields that are not part of the predefined breakdown
-        tentRentalInput.value = 0;
-        parkingFeeInput.value = 0;
-        miscCostInput.value = 0;
-
-        // Recalculate total
-        calculateTotal();
-
-        showToast(`Loaded "${trip.name}"`);
-    }
-
-    // Set up event listeners
-    function setupEventListeners() {
-        // Theme toggle
-        themeToggle.addEventListener('click', toggleTheme);
-        
-        // Settings modal
-        settingsBtn.addEventListener('click', () => toggleModal(settingsModal, true));
-        closeModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(settingsModal, false)));
-        applySettingsBtn.addEventListener('click', applySettings);
-        
-        // Copy modal
-        closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
-        copyToClipboardBtn.addEventListener('click', copyToClipboard);
-        
-        // Currency selection
-        currencyBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                currencyBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-        
-        // Decimal selection
-        decimalBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                decimalBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-        
-        // Save trip
-        saveBtn.addEventListener('click', saveTrip);
-        
-        // Clear history
-        clearHistoryBtn.addEventListener('click', clearHistory);
-        
-        // Input changes
-        const inputs = document.querySelectorAll('.form-control, .trip-description-input, .date-input');
-        inputs.forEach(input => {
-            input.addEventListener('input', calculateTotal);
-            input.addEventListener('change', calculateTotal);
-        });
-        
-        // Close modal on overlay click
-        settingsModal.addEventListener('click', (e) => {
-            if (e.target === settingsModal) {
-                toggleModal(settingsModal, false);
+        // Update theme toggle button
+        function updateThemeToggle() {
+            const isLightMode = document.body.classList.contains('light-mode');
+            const icon = themeToggle.querySelector('i');
+            const text = themeToggle.querySelector('span');
+            
+            if (isLightMode) {
+                icon.className = 'fas fa-sun';
+                text.textContent = 'Light';
+            } else {
+                icon.className = 'fas fa-moon';
+                text.textContent = 'Dark';
             }
-        });
-        
-        copyModal.addEventListener('click', (e) => {
-            if (e.target === copyModal) {
-                toggleModal(copyModal, false);
-            }
-        });
-
-        // NEW: Load trip button
-        loadTripBtn.addEventListener('click', loadPredefinedTrip);
-    }
-
-    // Toggle theme
-    function toggleTheme() {
-        document.body.classList.toggle('light-mode');
-        const isLightMode = document.body.classList.contains('light-mode');
-        localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
-        updateThemeToggle();
-    }
-
-    // Update theme toggle button
-    function updateThemeToggle() {
-        const isLightMode = document.body.classList.contains('light-mode');
-        const icon = themeToggle.querySelector('i');
-        const text = themeToggle.querySelector('span');
-        
-        if (isLightMode) {
-            icon.className = 'fas fa-sun';
-            text.textContent = 'Light';
-        } else {
-            icon.className = 'fas fa-moon';
-            text.textContent = 'Dark';
         }
-    }
 
-    // Toggle modal
-    function toggleModal(modal, show) {
-        if (show) {
-            if (modal === settingsModal) {
-                // Load current fuel efficiency into settings modal
-                fuelEfficiencyInput.value = state.fuelEfficiency;
-            }
-            modal.classList.add('active');
-        } else {
-            modal.classList.remove('active');
-        }
-    }
-
-    // Load settings from localStorage
-    function loadSettings() {
-        const savedCurrency = localStorage.getItem('currency');
-        const savedDecimals = localStorage.getItem('decimals');
-        const savedFuelEfficiency = localStorage.getItem('fuelEfficiency');
-        
-        if (savedCurrency) {
-            state.currency = savedCurrency;
-            currencyBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.currency === savedCurrency) {
-                    btn.classList.add('active');
+        // Toggle modal
+        function toggleModal(modal, show) {
+            if (show) {
+                if (modal === settingsModal) {
+                    // Load current fuel efficiency into settings modal
+                    fuelEfficiencyInput.value = state.fuelEfficiency;
                 }
+                modal.classList.add('active');
+            } else {
+                modal.classList.remove('active');
+            }
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedCurrency = localStorage.getItem('currency');
+            const savedDecimals = localStorage.getItem('decimals');
+            const savedFuelEfficiency = localStorage.getItem('fuelEfficiency');
+            
+            if (savedCurrency) {
+                state.currency = savedCurrency;
+                currencyBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.currency === savedCurrency) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            if (savedDecimals !== null) {
+                state.decimals = parseInt(savedDecimals);
+                decimalBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.dataset.decimals) === state.decimals) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            if (savedFuelEfficiency !== null) {
+                state.fuelEfficiency = parseFloat(savedFuelEfficiency);
+            }
+        }
+
+        // Apply settings
+        function applySettings() {
+            // Get fuel efficiency
+            state.fuelEfficiency = parseFloat(fuelEfficiencyInput.value) || 40;
+            
+            // Get selected currency
+            const activeCurrencyBtn = document.querySelector('.currency-btn.active');
+            state.currency = activeCurrencyBtn.dataset.currency;
+            
+            // Get selected decimal places
+            const activeDecimalBtn = document.querySelector('.decimal-btn.active');
+            state.decimals = parseInt(activeDecimalBtn.dataset.decimals);
+            
+            // Save to localStorage
+            localStorage.setItem('currency', state.currency);
+            localStorage.setItem('decimals', state.decimals);
+            localStorage.setItem('fuelEfficiency', state.fuelEfficiency);
+            
+            // Recalculate and update display
+            calculateTotal();
+            
+            // Close modal
+            toggleModal(settingsModal, false);
+            
+            // Show confirmation
+            showToast('Settings applied successfully');
+        }
+
+        // Calculate total cost
+        function calculateTotal() {
+            // Get input values
+            const distance = parseFloat(distanceInput.value) || 0;
+            const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
+            const campsiteFee = parseFloat(campsiteFeeInput.value) || 0;
+            const tentRental = parseFloat(tentRentalInput.value) || 0;
+            const parkingFee = parseFloat(parkingFeeInput.value) || 0;
+            const environmentalFee = parseFloat(environmentalFeeInput.value) || 0;
+            const foodCost = parseFloat(foodCostInput.value) || 0;
+            const miscCost = parseFloat(miscCostInput.value) || 0;
+            
+            // Calculate fuel cost per person
+            const fuelCostPerPerson = ((distance / state.fuelEfficiency) * fuelPrice) / 2;
+            
+            // Calculate total per person
+            const totalPerPerson = fuelCostPerPerson + campsiteFee + tentRental + parkingFee + environmentalFee + foodCost + miscCost;
+            
+            // Calculate total per pair
+            const totalPerPair = totalPerPerson * 2;
+            
+            // Format numbers
+            const formatOptions = {
+                minimumFractionDigits: state.decimals,
+                maximumFractionDigits: state.decimals
+            };
+            
+            const formattedTotalPerPerson = totalPerPerson.toLocaleString(undefined, formatOptions);
+            const formattedTotalPerPair = totalPerPair.toLocaleString(undefined, formatOptions);
+            
+            // Update display
+            totalAmount.textContent = `${state.currency} ${formattedTotalPerPerson}`;
+            perPerson.textContent = `Per Person: ${state.currency} ${formattedTotalPerPerson}`;
+            perPair.textContent = `Per Pair: ${state.currency} ${formattedTotalPerPair}`;
+            
+            return {
+                description: tripDescriptionInput.value || 'Unnamed Trip',
+                date: tripDateInput.value,
+                perPerson: totalPerPerson,
+                perPair: totalPerPair,
+                fuelCost: fuelCostPerPerson,
+                fuelPrice: fuelPrice,
+                distance: distance,
+                fuelEfficiency: state.fuelEfficiency,
+                campsiteFee,
+                tentRental,
+                parkingFee,
+                environmentalFee,
+                foodCost,
+                miscCost,
+                totalMisc: miscCost
+            };
+        }
+
+        // Format date for display
+        function formatDisplayDate(dateString) {
+            if (!dateString) return 'No date';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
         }
-        
-        if (savedDecimals !== null) {
-            state.decimals = parseInt(savedDecimals);
-            decimalBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (parseInt(btn.dataset.decimals) === state.decimals) {
-                    btn.classList.add('active');
-                }
-            });
-        }
-        
-        if (savedFuelEfficiency !== null) {
-            state.fuelEfficiency = parseFloat(savedFuelEfficiency);
-        }
-    }
 
-    // Apply settings
-    function applySettings() {
-        // Get fuel efficiency
-        state.fuelEfficiency = parseFloat(fuelEfficiencyInput.value) || 40;
-        
-        // Get selected currency
-        const activeCurrencyBtn = document.querySelector('.currency-btn.active');
-        state.currency = activeCurrencyBtn.dataset.currency;
-        
-        // Get selected decimal places
-        const activeDecimalBtn = document.querySelector('.decimal-btn.active');
-        state.decimals = parseInt(activeDecimalBtn.dataset.decimals);
-        
-        // Save to localStorage
-        localStorage.setItem('currency', state.currency);
-        localStorage.setItem('decimals', state.decimals);
-        localStorage.setItem('fuelEfficiency', state.fuelEfficiency);
-        
-        // Recalculate and update display
-        calculateTotal();
-        
-        // Close modal
-        toggleModal(settingsModal, false);
-        
-        // Show confirmation
-        showToast('Settings applied successfully');
-    }
-
-    // Calculate total cost
-    function calculateTotal() {
-        // Get input values
-        const distance = parseFloat(distanceInput.value) || 0;
-        const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
-        const campsiteFee = parseFloat(campsiteFeeInput.value) || 0;
-        const tentRental = parseFloat(tentRentalInput.value) || 0;
-        const parkingFee = parseFloat(parkingFeeInput.value) || 0;
-        const environmentalFee = parseFloat(environmentalFeeInput.value) || 0;
-        const foodCost = parseFloat(foodCostInput.value) || 0;
-        const miscCost = parseFloat(miscCostInput.value) || 0;
-        
-        // Calculate fuel cost per person
-        const fuelCostPerPerson = ((distance / state.fuelEfficiency) * fuelPrice) / 2;
-        
-        // Calculate total per person
-        const totalPerPerson = fuelCostPerPerson + campsiteFee + tentRental + parkingFee + environmentalFee + foodCost + miscCost;
-        
-        // Calculate total per pair
-        const totalPerPair = totalPerPerson * 2;
-        
-        // Format numbers
-        const formatOptions = {
-            minimumFractionDigits: state.decimals,
-            maximumFractionDigits: state.decimals
-        };
-        
-        const formattedTotalPerPerson = totalPerPerson.toLocaleString(undefined, formatOptions);
-        const formattedTotalPerPair = totalPerPair.toLocaleString(undefined, formatOptions);
-        
-        // Update display
-        totalAmount.textContent = `${state.currency} ${formattedTotalPerPerson}`;
-        perPerson.textContent = `Per Person: ${state.currency} ${formattedTotalPerPerson}`;
-        perPair.textContent = `Per Pair: ${state.currency} ${formattedTotalPerPair}`;
-        
-        return {
-            description: tripDescriptionInput.value || 'Unnamed Trip',
-            date: tripDateInput.value,
-            perPerson: totalPerPerson,
-            perPair: totalPerPair,
-            fuelCost: fuelCostPerPerson,
-            fuelPrice: fuelPrice,
-            distance: distance,
-            fuelEfficiency: state.fuelEfficiency,
-            campsiteFee,
-            tentRental,
-            parkingFee,
-            environmentalFee,
-            foodCost,
-            miscCost,
-            totalMisc: miscCost
-        };
-    }
-
-    // Format date for display
-    function formatDisplayDate(dateString) {
-        if (!dateString) return 'No date';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-    }
-
-    // Generate formatted text for sharing
-    function generateShareText(trip) {
-        const formatOptions = {
-            minimumFractionDigits: state.decimals,
-            maximumFractionDigits: state.decimals
-        };
-        
-        const dateStr = formatDisplayDate(trip.date);
-        
-        return `🏍️ ${trip.description} - ${dateStr}
+        // Generate formatted text for sharing
+        function generateShareText(trip) {
+            const formatOptions = {
+                minimumFractionDigits: state.decimals,
+                maximumFractionDigits: state.decimals
+            };
+            
+            const dateStr = formatDisplayDate(trip.date);
+            
+            return `🏍️ ${trip.description} - ${dateStr}
 
 💰 TOTAL: ${state.currency} ${trip.perPerson.toLocaleString(undefined, formatOptions)} per person
        ${state.currency} ${trip.perPair.toLocaleString(undefined, formatOptions)} per pair
@@ -1896,283 +1767,285 @@
 
 📅 Trip Date: ${dateStr}
 ⚙️ Calculated with MotorTrip Calc`;
-    }
-
-    // Show copy modal
-    function showCopyModal(trip) {
-        const shareText = generateShareText(trip);
-        copyText.textContent = shareText;
-        toggleModal(copyModal, true);
-    }
-
-    // Copy to clipboard
-    function copyToClipboard() {
-        const text = copyText.textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            showToast('Copied to clipboard!');
-            toggleModal(copyModal, false);
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-            showToast('Failed to copy to clipboard');
-        });
-    }
-
-    // Save trip to history
-    function saveTrip() {
-        // Get trip description
-        const description = tripDescriptionInput.value.trim();
-        if (!description) {
-            showToast('Please enter a trip description');
-            tripDescriptionInput.focus();
-            return;
         }
-        
-        // Calculate current trip
-        const tripData = calculateTotal();
-        
-        // Create history item
-        const historyItem = {
-            id: Date.now(),
-            date: tripData.date,
-            description: description,
-            ...tripData,
-            currency: state.currency,
-            decimals: state.decimals,
-            savedAt: new Date().toISOString()
-        };
-        
-        // Add to history
-        state.history.unshift(historyItem);
-        
-        // Save to localStorage
-        saveHistory();
-        
-        // Update history display
-        updateHistoryDisplay();
-        
-        // Show confirmation
-        showToast(`"${description}" saved to history`);
-    }
 
-    // Load history from localStorage
-    function loadHistory() {
-        const savedHistory = localStorage.getItem('tripHistory');
-        if (savedHistory) {
-            state.history = JSON.parse(savedHistory);
-            updateHistoryDisplay();
+        // Show copy modal
+        function showCopyModal(trip) {
+            const shareText = generateShareText(trip);
+            copyText.textContent = shareText;
+            toggleModal(copyModal, true);
         }
-    }
 
-    // Save history to localStorage
-    function saveHistory() {
-        localStorage.setItem('tripHistory', JSON.stringify(state.history));
-    }
-
-    // Update history display
-    function updateHistoryDisplay() {
-        // Clear current history
-        historyList.innerHTML = '';
-        
-        // Check if history is empty
-        if (state.history.length === 0) {
-            const emptyItem = document.createElement('div');
-            emptyItem.className = 'history-item empty-history';
-            emptyItem.innerHTML = `
-                <div class="history-date">No trips saved yet</div>
-                <div class="history-details">
-                    <div class="history-detail">
-                        <span>Save a trip to see it here</span>
-                    </div>
-                </div>
-            `;
-            historyList.appendChild(emptyItem);
-            return;
+        // Copy to clipboard
+        function copyToClipboard() {
+            const text = copyText.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+                toggleModal(copyModal, false);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showToast('Failed to copy to clipboard');
+            });
         }
-        
-        // Add history items
-        state.history.forEach(item => {
-            const formatOptions = {
-                minimumFractionDigits: item.decimals || 0,
-                maximumFractionDigits: item.decimals || 0
+
+        // Save trip to history
+        function saveTrip() {
+            // Get trip description
+            const description = tripDescriptionInput.value.trim();
+            if (!description) {
+                showToast('Please enter a trip description');
+                tripDescriptionInput.focus();
+                return;
+            }
+            
+            // Calculate current trip
+            const tripData = calculateTotal();
+            
+            // Create history item
+            const historyItem = {
+                id: Date.now(),
+                date: tripData.date,
+                description: description,
+                ...tripData,
+                currency: state.currency,
+                decimals: state.decimals,
+                savedAt: new Date().toISOString()
             };
             
-            // Format date for display
-            const displayDate = formatDisplayDate(item.date);
+            // Add to history
+            state.history.unshift(historyItem);
             
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.innerHTML = `
-                <div class="history-header-row">
-                    <div class="history-title">${item.description}</div>
-                    <div class="history-total">${item.currency || '₱'} ${item.perPerson.toLocaleString(undefined, formatOptions)}</div>
-                    <div class="history-date">${displayDate}</div>
-                </div>
-                <div class="history-details">
-                    <div class="history-detail">
-                        <span>Distance:</span>
-                        <span>${item.distance} km</span>
-                    </div>
-                    <div class="history-detail">
-                        <span>Fuel:</span>
-                        <span>${item.currency || '₱'} ${item.fuelCost.toLocaleString(undefined, formatOptions)}</span>
-                    </div>
-                    <div class="history-detail">
-                        <span>Camping:</span>
-                        <span>${item.currency || '₱'} ${(item.campsiteFee + item.tentRental + item.parkingFee + item.environmentalFee).toLocaleString(undefined, formatOptions)}</span>
-                    </div>
-                    <div class="history-detail">
-                        <span>Food:</span>
-                        <span>${item.currency || '₱'} ${item.foodCost.toLocaleString(undefined, formatOptions)}</span>
-                    </div>
-                    <div class="history-detail">
-                        <span>Other:</span>
-                        <span>${item.currency || '₱'} ${item.totalMisc.toLocaleString(undefined, formatOptions)}</span>
-                    </div>
-                    <div class="history-detail">
-                        <span>Fuel Eff:</span>
-                        <span>${item.fuelEfficiency} km/L</span>
-                    </div>
-                </div>
-                <div class="history-actions">
-                    <button class="btn btn-secondary history-btn load-trip-btn" data-id="${item.id}">
-                        <i class="fas fa-undo"></i> Load
-                    </button>
-                    <button class="btn btn-secondary history-btn copy-trip-btn" data-id="${item.id}">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
-                    <button class="btn btn-secondary history-btn delete-trip-btn" data-id="${item.id}">
-                        <i class="fas fa-trash-alt"></i> Delete
-                    </button>
-                </div>
-            `;
+            // Save to localStorage
+            saveHistory();
             
-            historyList.appendChild(historyItem);
-        });
-        
-        // Add event listeners to history buttons
-        document.querySelectorAll('.load-trip-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.currentTarget.dataset.id);
-                loadTrip(id);
-            });
-        });
-        
-        document.querySelectorAll('.copy-trip-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.currentTarget.dataset.id);
-                copyTrip(id);
-            });
-        });
-        
-        document.querySelectorAll('.delete-trip-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.currentTarget.dataset.id);
-                deleteTrip(id);
-            });
-        });
-    }
-
-    // Load trip from history
-    function loadTrip(id) {
-        const trip = state.history.find(item => item.id === id);
-        if (!trip) return;
-        
-        // Update inputs
-        tripDescriptionInput.value = trip.description;
-        tripDateInput.value = trip.date;
-        distanceInput.value = trip.distance;
-        fuelPriceInput.value = trip.fuelPrice;
-        campsiteFeeInput.value = trip.campsiteFee;
-        tentRentalInput.value = trip.tentRental;
-        parkingFeeInput.value = trip.parkingFee;
-        environmentalFeeInput.value = trip.environmentalFee;
-        foodCostInput.value = trip.foodCost;
-        miscCostInput.value = trip.totalMisc;
-        
-        // Update fuel efficiency in settings
-        state.fuelEfficiency = trip.fuelEfficiency;
-        
-        // Update currency and decimals
-        if (trip.currency) state.currency = trip.currency;
-        if (trip.decimals !== undefined) state.decimals = trip.decimals;
-        
-        // Recalculate
-        calculateTotal();
-        
-        // Show confirmation
-        showToast(`"${trip.description}" loaded from history`);
-    }
-
-    // Copy trip details
-    function copyTrip(id) {
-        const trip = state.history.find(item => item.id === id);
-        if (!trip) return;
-        
-        showCopyModal(trip);
-    }
-
-    // Delete trip from history
-    function deleteTrip(id) {
-        const trip = state.history.find(item => item.id === id);
-        if (!trip) return;
-        
-        if (confirm(`Are you sure you want to delete "${trip.description}"?`)) {
-            state.history = state.history.filter(item => item.id !== id);
-            saveHistory();
+            // Update history display
             updateHistoryDisplay();
-            showToast(`"${trip.description}" deleted from history`);
+            
+            // Show confirmation
+            showToast(`"${description}" saved to history`);
         }
-    }
 
-    // Clear all history
-    function clearHistory() {
-        if (state.history.length === 0) return;
-        
-        if (confirm('Are you sure you want to clear all trip history?')) {
-            state.history = [];
-            saveHistory();
-            updateHistoryDisplay();
-            showToast('All history cleared');
+        // Load history from localStorage
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('tripHistory');
+            if (savedHistory) {
+                state.history = JSON.parse(savedHistory);
+                updateHistoryDisplay();
+            }
         }
-    }
 
-    // Show toast notification
-    function showToast(message) {
-        toastMessage.textContent = message;
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
+        // Save history to localStorage
+        function saveHistory() {
+            localStorage.setItem('tripHistory', JSON.stringify(state.history));
+        }
 
-    // Initialize the app when DOM is loaded
-    document.addEventListener('DOMContentLoaded', init);
-
-    // Add Service Worker Registration at the end of your existing script
-    document.addEventListener('DOMContentLoaded', function() {
-        // Your existing init() call
-        init();
-        
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(function(registration) {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('Service Worker registration failed:', error);
-                    });
+        // Update history display
+        function updateHistoryDisplay() {
+            // Clear current history
+            historyList.innerHTML = '';
+            
+            // Check if history is empty
+            if (state.history.length === 0) {
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'history-item empty-history';
+                emptyItem.innerHTML = `
+                    <div class="history-date">No trips saved yet</div>
+                    <div class="history-details">
+                        <div class="history-detail">
+                            <span>Save a trip to see it here</span>
+                        </div>
+                    </div>
+                `;
+                historyList.appendChild(emptyItem);
+                return;
+            }
+            
+            // Add history items
+            state.history.forEach(item => {
+                const formatOptions = {
+                    minimumFractionDigits: item.decimals || 0,
+                    maximumFractionDigits: item.decimals || 0
+                };
+                
+                // Format date for display
+                const displayDate = formatDisplayDate(item.date);
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-header-row">
+                        <div class="history-title">${item.description}</div>
+                        <div class="history-total">${item.currency || '₱'} ${item.perPerson.toLocaleString(undefined, formatOptions)}</div>
+                        <div class="history-date">${displayDate}</div>
+                    </div>
+                    <div class="history-details">
+                        <div class="history-detail">
+                            <span>Distance:</span>
+                            <span>${item.distance} km</span>
+                        </div>
+                        <div class="history-detail">
+                            <span>Fuel:</span>
+                            <span>${item.currency || '₱'} ${item.fuelCost.toLocaleString(undefined, formatOptions)}</span>
+                        </div>
+                        <div class="history-detail">
+                            <span>Camping:</span>
+                            <span>${item.currency || '₱'} ${(item.campsiteFee + item.tentRental + item.parkingFee + item.environmentalFee).toLocaleString(undefined, formatOptions)}</span>
+                        </div>
+                        <div class="history-detail">
+                            <span>Food:</span>
+                            <span>${item.currency || '₱'} ${item.foodCost.toLocaleString(undefined, formatOptions)}</span>
+                        </div>
+                        <div class="history-detail">
+                            <span>Other:</span>
+                            <span>${item.currency || '₱'} ${item.totalMisc.toLocaleString(undefined, formatOptions)}</span>
+                        </div>
+                        <div class="history-detail">
+                            <span>Fuel Eff:</span>
+                            <span>${item.fuelEfficiency} km/L</span>
+                        </div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn btn-secondary history-btn load-trip-btn" data-id="${item.id}">
+                            <i class="fas fa-undo"></i> Load
+                        </button>
+                        <button class="btn btn-secondary history-btn copy-trip-btn" data-id="${item.id}">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="btn btn-secondary history-btn delete-trip-btn" data-id="${item.id}">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                    </div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+            
+            // Add event listeners to history buttons
+            document.querySelectorAll('.load-trip-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    loadTrip(id);
+                });
+            });
+            
+            document.querySelectorAll('.copy-trip-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    copyTrip(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-trip-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    deleteTrip(id);
+                });
             });
         }
-        
-        // Detect if running as standalone PWA
-        if (window.matchMedia('(display-mode: standalone)').matches || 
-            window.navigator.standalone === true) {
-            console.log('Running as PWA');
+
+        // Load trip from history
+        function loadTrip(id) {
+            const trip = state.history.find(item => item.id === id);
+            if (!trip) return;
+            
+            // Update inputs
+            tripDescriptionInput.value = trip.description;
+            tripDateInput.value = trip.date;
+            distanceInput.value = trip.distance;
+            fuelPriceInput.value = trip.fuelPrice;
+            campsiteFeeInput.value = trip.campsiteFee;
+            tentRentalInput.value = trip.tentRental;
+            parkingFeeInput.value = trip.parkingFee;
+            environmentalFeeInput.value = trip.environmentalFee;
+            foodCostInput.value = trip.foodCost;
+            miscCostInput.value = trip.totalMisc;
+            
+            // Update fuel efficiency in settings
+            state.fuelEfficiency = trip.fuelEfficiency;
+            
+            // Update currency and decimals
+            if (trip.currency) state.currency = trip.currency;
+            if (trip.decimals !== undefined) state.decimals = trip.decimals;
+            
+            // Recalculate
+            calculateTotal();
+            
+            // Show confirmation
+            showToast(`"${trip.description}" loaded from history`);
         }
-    });
+
+        // Copy trip details
+        function copyTrip(id) {
+            const trip = state.history.find(item => item.id === id);
+            if (!trip) return;
+            
+            showCopyModal(trip);
+        }
+
+        // Delete trip from history
+        function deleteTrip(id) {
+            const trip = state.history.find(item => item.id === id);
+            if (!trip) return;
+            
+            if (confirm(`Are you sure you want to delete "${trip.description}"?`)) {
+                state.history = state.history.filter(item => item.id !== id);
+                saveHistory();
+                updateHistoryDisplay();
+                showToast(`"${trip.description}" deleted from history`);
+            }
+        }
+
+        // Clear all history
+        function clearHistory() {
+            if (state.history.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear all trip history?')) {
+                state.history = [];
+                saveHistory();
+                updateHistoryDisplay();
+                showToast('All history cleared');
+            }
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+        
+        // Add Service Worker Registration at the end of your existing script
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your existing init() call
+            init();
+            
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(function(registration) {
+                            console.log('Service Worker registered with scope:', registration.scope);
+                        })
+                        .catch(function(error) {
+                            console.log('Service Worker registration failed:', error);
+                        });
+                });
+            }
+            
+            // Detect if running as standalone PWA
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                console.log('Running as PWA');
+            }
+        });
     </script>
-</body>
+
+    </body>
 </html>
