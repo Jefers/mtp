@@ -74,7 +74,7 @@
             --spacing-lg: 24px;
             --spacing-xl: 32px;
             
-            /* Z-index layers */
+            /* Z-index layers - simple and positive */
             --z-background: 0;
             --z-content: 10;
             --z-overlay: 100;
@@ -96,13 +96,6 @@
             0%, 100% { transform: translateX(0) rotate(0deg); }
             25% { transform: translateX(5px) rotate(5deg); }
             75% { transform: translateX(-5px) rotate(-5deg); }
-        }
-
-        /* Pulse animation for map icon */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
         }
 
         /* Base Styles */
@@ -292,13 +285,11 @@
         .map-icon {
             color: var(--accent-color);
             cursor: pointer;
-            font-size: 1.8rem; /* bigger */
+            font-size: 1.2rem;
             transition: transform 0.2s;
-            animation: pulse 2s infinite ease-in-out;
         }
         .map-icon:hover {
-            transform: scale(1.3);
-            animation: none;
+            transform: scale(1.2);
         }
 
         .total-amount {
@@ -365,7 +356,7 @@
             font-size: 16px;
         }
 
-        /* Predefined Trips Selector + Import button */
+        /* Predefined Trips Selector */
         .predefined-trips-group {
             margin: var(--spacing-lg) 0;
             padding: var(--spacing-md) 0;
@@ -384,12 +375,10 @@
             display: flex;
             gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         .trip-select-row select {
-            flex: 2;
-            min-width: 200px;
+            flex: 1;
             padding: 14px 16px;
             background: var(--tertiary-bg);
             border: 1px solid var(--border-color);
@@ -403,16 +392,6 @@
             width: auto;
             padding: 14px 20px;
             white-space: nowrap;
-        }
-
-        .import-btn {
-            background: var(--tertiary-bg);
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-        }
-        .import-btn:hover {
-            background: var(--accent-color);
-            color: white;
         }
 
         /* Input Form */
@@ -759,25 +738,29 @@
             border-color: var(--accent-color);
         }
 
-        /* Map Modal (new style) */
+        /* Map Modal (new) */
         .map-modal-content {
-            max-width: 500px;
+            max-width: 700px;
+            width: 95%;
         }
-        .coords-display {
-            background: var(--tertiary-bg);
-            padding: 12px;
-            border-radius: var(--border-radius-input);
-            text-align: center;
+        .map-container {
+            width: 100%;
+            height: 400px;
             margin: 15px 0;
-            font-family: monospace;
-            font-size: 1.1rem;
+            border-radius: var(--border-radius-input);
+            overflow: hidden;
+            background: var(--tertiary-bg);
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
         .rating-info {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
-            margin: 15px 0;
+            margin-top: 10px;
             padding: 10px;
             background: var(--tertiary-bg);
             border-radius: var(--border-radius-button);
@@ -788,51 +771,6 @@
         }
         .review-count {
             color: var(--secondary-text);
-        }
-        .google-maps-btn {
-            background: #4285F4;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px;
-            border-radius: var(--border-radius-button);
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-        .google-maps-btn:hover {
-            background: #3367D6;
-        }
-
-        /* Import Modal */
-        .import-textarea {
-            width: 100%;
-            min-height: 200px;
-            background: var(--tertiary-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-input);
-            color: var(--primary-text);
-            padding: 12px;
-            font-family: monospace;
-            font-size: 14px;
-            margin: 15px 0;
-            resize: vertical;
-        }
-        .import-prompt {
-            background: var(--tertiary-bg);
-            padding: 12px;
-            border-radius: var(--border-radius-input);
-            font-size: 0.9rem;
-            border-left: 3px solid var(--accent-color);
-            margin-bottom: 15px;
-        }
-        .import-prompt code {
-            background: rgba(0,0,0,0.3);
-            padding: 2px 4px;
-            border-radius: 4px;
         }
 
         /* Copy Modal */
@@ -1054,8 +992,7 @@
             
             .card-glow-wrapper::before,
             .card-glow-wrapper::after,
-            .motorcycle-icon,
-            .map-icon {
+            .motorcycle-icon {
                 animation: none !important;
             }
             
@@ -1117,7 +1054,7 @@
                     </div>
                 </div>
 
-                <!-- Predefined Trips Selector + Import button -->
+                <!-- Predefined Trips Selector -->
                 <div class="predefined-trips-group">
                     <label for="tripSelect">Load a sample camping trip:</label>
                     <div class="trip-select-row">
@@ -1126,9 +1063,6 @@
                         </select>
                         <button type="button" class="btn btn-secondary" id="loadTripBtn">
                             <i class="fas fa-download"></i> Load
-                        </button>
-                        <button type="button" class="btn btn-secondary import-btn" id="importBtn">
-                            <i class="fas fa-file-import"></i> Import
                         </button>
                     </div>
                 </div>
@@ -1354,56 +1288,25 @@
         </div>
     </div>
 
-    <!-- Map Modal (now with Google Maps link) -->
+    <!-- Map Modal (new) -->
     <div class="modal-overlay" id="mapModal">
         <div class="modal map-modal-content">
             <div class="modal-header">
                 <h2><i class="fas fa-map-marked-alt"></i> <span id="mapLocationName">Location</span></h2>
                 <button class="close-modal" id="closeMapModalBtn">&times;</button>
             </div>
-            <div class="coords-display" id="mapCoords"></div>
+            <div class="map-container" id="mapContainer">
+                <!-- iframe will be inserted here -->
+            </div>
             <div class="rating-info" id="ratingInfo" style="display: none;">
                 <span class="rating-stars" id="ratingStars"></span>
                 <span class="review-count" id="reviewCount"></span>
             </div>
-            <a href="#" target="_blank" id="googleMapsLink" class="google-maps-btn">
-                <i class="fab fa-google"></i> Open in Google Maps
-            </a>
-            <div class="button-group" style="margin-top: 15px;">
-                <button type="button" class="btn btn-secondary" id="closeMapModalBtn2">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Import Modal -->
-    <div class="modal-overlay" id="importModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-file-import"></i> Import Trips</h2>
-                <button class="close-modal" id="closeImportModalBtn">&times;</button>
-            </div>
-            <div class="import-prompt">
-                <p>Paste JSON array from LLM using this format:</p>
-                <code>
-                [
-                  {
-                    "name": "Campsite Name",
-                    "campsiteFee": 500,
-                    "foodCost": 150,
-                    "environmentalFee": 0,
-                    "lat": 14.6548,
-                    "lon": 121.3411,
-                    "rating": 4.5,
-                    "reviews": 120
-                  }
-                ]
-                </code>
-                <p style="margin-top:8px;">Only <strong>name</strong>, <strong>campsiteFee</strong>, and <strong>foodCost</strong> are required. Others optional.</p>
-            </div>
-            <textarea id="importData" class="import-textarea" placeholder='Paste JSON here...'></textarea>
+            <p style="color: var(--secondary-text); text-align: center; margin-top: 10px;">
+                <small>Coordinates: <span id="mapCoords"></span></small>
+            </p>
             <div class="button-group">
-                <button type="button" class="btn btn-secondary" id="closeImportModalBtn2">Cancel</button>
-                <button type="button" class="btn btn-primary" id="processImportBtn">Import Trips</button>
+                <button type="button" class="btn btn-secondary" id="closeMapModalBtn2">Close</button>
             </div>
         </div>
     </div>
@@ -1496,8 +1399,7 @@
         currency: '₱',
         decimals: 0,
         fuelEfficiency: 40,
-        history: [],
-        importedTrips: []   // will be merged with default trips
+        history: []
     };
 
     // Current trip coordinates (if known)
@@ -1509,8 +1411,8 @@
         reviews: null
     };
 
-    // ---------- DEFAULT SAMPLE TRIPS (built-in) ----------
-    const defaultTrips = [
+    // ---------- SAMPLE TRIPS with coordinates and ratings ----------
+    const sampleTrips = [
         { 
             name: "River Ranch PH (Tanay)", 
             campsiteFee: 800, 
@@ -1546,7 +1448,7 @@
             campsiteFee: 400, 
             foodCost: 150, 
             environmentalFee: 50,
-            lat: 14.5450,
+            lat: 14.5450,   // LF Campsite approx
             lon: 121.2950,
             rating: 4.4,
             reviews: 1300
@@ -1593,9 +1495,6 @@
         }
     ];
 
-    // Combined trips (default + imported)
-    let allTrips = [...defaultTrips];
-
     // DOM Elements
     const themeToggle = document.getElementById('themeToggle');
     const settingsBtn = document.getElementById('settingsBtn');
@@ -1604,14 +1503,11 @@
     const settingsModal = document.getElementById('settingsModal');
     const mapModal = document.getElementById('mapModal');
     const copyModal = document.getElementById('copyModal');
-    const importModal = document.getElementById('importModal');
     const closeModalBtns = document.querySelectorAll('#closeModalBtn, #closeModalBtn2');
     const closeMapModalBtns = document.querySelectorAll('#closeMapModalBtn, #closeMapModalBtn2');
     const closeCopyModalBtns = document.querySelectorAll('#closeCopyModalBtn, #closeCopyModalBtn2');
-    const closeImportModalBtns = document.querySelectorAll('#closeImportModalBtn, #closeImportModalBtn2');
     const applySettingsBtn = document.getElementById('applySettingsBtn');
     const copyToClipboardBtn = document.getElementById('copyToClipboardBtn');
-    const processImportBtn = document.getElementById('processImportBtn');
     const currencyBtns = document.querySelectorAll('.currency-btn');
     const decimalBtns = document.querySelectorAll('.decimal-btn');
     const totalAmount = document.getElementById('totalAmount');
@@ -1637,17 +1533,15 @@
 
     const tripSelect = document.getElementById('tripSelect');
     const loadTripBtn = document.getElementById('loadTripBtn');
-    const importBtn = document.getElementById('importBtn');
-    const importData = document.getElementById('importData');
 
     // Map elements
     const mapIcon = document.getElementById('mapIcon');
     const mapLocationName = document.getElementById('mapLocationName');
-    const mapCoords = document.getElementById('mapCoords');
+    const mapContainer = document.getElementById('mapContainer');
     const ratingInfo = document.getElementById('ratingInfo');
     const ratingStars = document.getElementById('ratingStars');
     const reviewCount = document.getElementById('reviewCount');
-    const googleMapsLink = document.getElementById('googleMapsLink');
+    const mapCoords = document.getElementById('mapCoords');
 
     // Initialize the app
     function init() {
@@ -1658,10 +1552,6 @@
             localStorage.setItem('appName', appNameDiv.textContent);
         });
 
-        // Load imported trips from localStorage
-        loadImportedTrips();
-
-        // Populate dropdown with all trips
         populateTripSelect();
 
         const today = new Date();
@@ -1679,34 +1569,8 @@
         setupEventListeners();
     }
 
-    function loadImportedTrips() {
-        const saved = localStorage.getItem('importedTrips');
-        if (saved) {
-            try {
-                state.importedTrips = JSON.parse(saved);
-                // Merge with defaults, avoid duplicates by name? Simple: just concatenate.
-                allTrips = [...defaultTrips, ...state.importedTrips];
-            } catch (e) {
-                console.warn('Failed to load imported trips', e);
-            }
-        } else {
-            allTrips = [...defaultTrips];
-        }
-    }
-
-    function saveImportedTrips() {
-        localStorage.setItem('importedTrips', JSON.stringify(state.importedTrips));
-        // Refresh the combined list
-        allTrips = [...defaultTrips, ...state.importedTrips];
-        populateTripSelect();
-    }
-
     function populateTripSelect() {
-        // Clear existing options except the first placeholder
-        while (tripSelect.options.length > 1) {
-            tripSelect.remove(1);
-        }
-        allTrips.forEach(trip => {
+        sampleTrips.forEach(trip => {
             const option = document.createElement('option');
             option.value = trip.name;
             option.textContent = trip.name;
@@ -1720,7 +1584,7 @@
             showToast('Please select a trip');
             return;
         }
-        const trip = allTrips.find(t => t.name === selectedName);
+        const trip = sampleTrips.find(t => t.name === selectedName);
         if (!trip) return;
 
         tripDescriptionInput.value = trip.name;
@@ -1733,18 +1597,18 @@
         
         // Update current trip coordinates
         currentTrip = {
-            lat: trip.lat || null,
-            lon: trip.lon || null,
+            lat: trip.lat,
+            lon: trip.lon,
             name: trip.name,
-            rating: trip.rating || null,
-            reviews: trip.reviews || null
+            rating: trip.rating,
+            reviews: trip.reviews
         };
         
         calculateTotal();
         showToast(`Loaded "${trip.name}"`);
     }
 
-    // Show map modal with Google Maps link
+    // Show map modal with current coordinates
     function showMap() {
         let lat = currentTrip.lat;
         let lon = currentTrip.lon;
@@ -1757,9 +1621,24 @@
             name = 'Tanay, Rizal (default)';
         }
 
+        // Build Google Maps embed URL
+        const mapUrl = `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${lat},${lon}`;
+        // Note: Replace YOUR_API_KEY with a valid Google Maps API key. For demo, we use a placeholder.
+        // In production, you'd need to register for a key. Alternatively, use OpenStreetMap iframe.
+        // For now, we'll use OpenStreetMap (no key required) via a static map or embed.
+        // Actually, OpenStreetMap doesn't have an easy embed. Let's use a free tile service: 
+        // We'll use a static map image from a free service? Better: use iframe with Google Maps without key? That won't work.
+        // To keep it simple, we'll use a link to Google Maps instead of an iframe.
+        // But the user wants a popup with map. We can use a static image from a free API like MapKit.
+        // Since we don't have a key, we'll use a placeholder that says "Map view requires API key". 
+        // In a real app, you'd get a key. I'll use a simple iframe with OpenStreetMap's embed (which works without key).
+        
+        // OpenStreetMap iframe example:
+        const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.01}%2C${lat-0.01}%2C${lon+0.01}%2C${lat+0.01}&layer=mapnik&marker=${lat}%2C${lon}`;
+        
+        mapContainer.innerHTML = `<iframe src="${osmUrl}" style="width:100%; height:100%; border:0" allowfullscreen></iframe>`;
         mapLocationName.textContent = name;
         mapCoords.textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-        googleMapsLink.href = `https://maps.google.com/?daddr=${lat},${lon}`;
 
         // Show rating if available
         if (currentTrip.rating) {
@@ -1775,48 +1654,6 @@
         toggleModal(mapModal, true);
     }
 
-    // Import trips from JSON
-    function importTrips() {
-        const raw = importData.value.trim();
-        if (!raw) {
-            showToast('Please paste some JSON data');
-            return;
-        }
-        try {
-            const imported = JSON.parse(raw);
-            if (!Array.isArray(imported)) {
-                showToast('Data must be an array');
-                return;
-            }
-            // Basic validation
-            const validTrips = [];
-            for (const item of imported) {
-                if (!item.name || typeof item.campsiteFee !== 'number' || typeof item.foodCost !== 'number') {
-                    showToast('Each trip must have name (string), campsiteFee (number), foodCost (number)');
-                    return;
-                }
-                // Optional fields
-                validTrips.push({
-                    name: item.name,
-                    campsiteFee: item.campsiteFee,
-                    foodCost: item.foodCost,
-                    environmentalFee: item.environmentalFee || 0,
-                    lat: item.lat || null,
-                    lon: item.lon || null,
-                    rating: item.rating || null,
-                    reviews: item.reviews || null
-                });
-            }
-            // Append to importedTrips (avoid duplicates by name? optional)
-            state.importedTrips = [...state.importedTrips, ...validTrips];
-            saveImportedTrips();
-            toggleModal(importModal, false);
-            showToast(`Imported ${validTrips.length} trip(s)`);
-        } catch (e) {
-            showToast('Invalid JSON: ' + e.message);
-        }
-    }
-
     function setupEventListeners() {
         themeToggle.addEventListener('click', toggleTheme);
         
@@ -1828,9 +1665,6 @@
         
         closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
         copyToClipboardBtn.addEventListener('click', copyToClipboard);
-        
-        closeImportModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(importModal, false)));
-        processImportBtn.addEventListener('click', importTrips);
         
         saveBtn.addEventListener('click', saveTrip);
         clearHistoryBtn.addEventListener('click', clearHistory);
@@ -1852,16 +1686,8 @@
         copyModal.addEventListener('click', (e) => {
             if (e.target === copyModal) toggleModal(copyModal, false);
         });
-        
-        importModal.addEventListener('click', (e) => {
-            if (e.target === importModal) toggleModal(importModal, false);
-        });
 
         loadTripBtn.addEventListener('click', loadSampleTrip);
-        importBtn.addEventListener('click', () => {
-            importData.value = ''; // clear previous
-            toggleModal(importModal, true);
-        });
 
         // Map icon click
         mapIcon.addEventListener('click', showMap);
@@ -2022,7 +1848,7 @@
             currency: state.currency,
             decimals: state.decimals,
             savedAt: new Date().toISOString(),
-            // Save current coordinates
+            // Optionally save coordinates if from sample trip
             lat: currentTrip.lat,
             lon: currentTrip.lon,
             rating: currentTrip.rating,
