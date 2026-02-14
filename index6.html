@@ -31,8 +31,8 @@
         :root {
             /* Color scheme - Dark mode */
             --primary-bg: #0a0a0a;
-            --secondary-bg: #1a1a1a;
-            --tertiary-bg: #2a2a2a;
+            --secondary-bg: rgba(26, 26, 26, 0.85);
+            --tertiary-bg: rgba(42, 42, 42, 0.9);
             --primary-text: #ffffff;
             --secondary-text: #a0a0a0;
             --accent-color: #3b82f6;
@@ -40,8 +40,8 @@
             
             /* Light mode overrides */
             --primary-bg-light: #ffffff;
-            --secondary-bg-light: #f8f9fa;
-            --tertiary-bg-light: #e9ecef;
+            --secondary-bg-light: rgba(248, 249, 250, 0.9);
+            --tertiary-bg-light: rgba(233, 236, 239, 0.95);
             --primary-text-light: #1a1a1a;
             --secondary-text-light: #6c757d;
             --border-color-light: rgba(0, 0, 0, 0.1);
@@ -74,28 +74,33 @@
             --spacing-lg: 24px;
             --spacing-xl: 32px;
             
-            /* Z-index layers - simple and positive */
-            --z-background: 0;
+            /* Z-index layers */
+            --z-background: -10;
             --z-content: 10;
-            --z-overlay: 100;
             --z-modal: 1000;
             --z-toast: 10000;
         }
 
         .light-mode {
             --primary-bg: var(--primary-bg-light);
-            --secondary-bg: var(--secondary-bg-light);
-            --tertiary-bg: var(--tertiary-bg-light);
+            --secondary-bg: rgba(248, 249, 250, 0.9);
+            --tertiary-bg: rgba(233, 236, 239, 0.95);
             --primary-text: var(--primary-text-light);
             --secondary-text: var(--secondary-text-light);
             --border-color: var(--border-color-light);
         }
 
-        /* Animated motorcycle icon (added for fun) */
+        /* Animated motorcycle icon */
         @keyframes motorcycle-move {
-            0%, 100% { transform: translateX(0) rotate(0deg); }
-            25% { transform: translateX(5px) rotate(5deg); }
-            75% { transform: translateX(-5px) rotate(-5deg); }
+            0%, 100% { 
+                transform: translateX(0) rotate(0deg); 
+            }
+            25% { 
+                transform: translateX(5px) rotate(5deg); 
+            }
+            75% { 
+                transform: translateX(-5px) rotate(-5deg); 
+            }
         }
 
         /* Base Styles */
@@ -117,6 +122,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+            overflow-x: hidden;
         }
 
         .container {
@@ -136,6 +143,10 @@
             margin-bottom: var(--spacing-lg);
             padding-bottom: var(--spacing-md);
             border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            padding: var(--spacing-md);
         }
 
         .app-title {
@@ -161,6 +172,7 @@
             background-clip: text;
             color: transparent;
             cursor: text;
+            min-width: 200px;
             outline: none;
             border-bottom: 2px dashed transparent;
             transition: border-color 0.2s;
@@ -180,10 +192,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            backdrop-filter: blur(5px);
         }
 
         .theme-toggle:hover {
             background: var(--secondary-bg);
+            transform: translateY(-2px);
         }
 
         /* Animated Glowing Border System */
@@ -204,9 +218,9 @@
         .card-glow-wrapper::after {
             content: '';
             position: absolute;
-            pointer-events: none;  /* ensure they don't block clicks */
+            pointer-events: none;
             border-radius: calc(var(--border-radius-card) + 4px);
-            z-index: var(--z-background);
+            z-index: calc(var(--z-background) + 1);
             animation: rotate 4s linear infinite;
         }
 
@@ -234,7 +248,7 @@
                 var(--glow-color-4),
                 var(--glow-color-1)
             );
-            z-index: calc(var(--z-background) + 1);
+            z-index: calc(var(--z-background) + 2);
         }
 
         @keyframes rotate {
@@ -261,8 +275,10 @@
             background: var(--secondary-bg);
             border-radius: var(--border-radius-card);
             padding: var(--spacing-lg);
-            z-index: calc(var(--z-background) + 2);
+            z-index: calc(var(--z-background) + 3);
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         /* Total Display */
@@ -279,7 +295,7 @@
         }
 
         .total-amount {
-            font-size: 3rem;
+            font-size: 3.2rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--theme-1), var(--theme-2));
             -webkit-background-clip: text;
@@ -304,21 +320,23 @@
 
         .trip-description-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px;
             background: var(--tertiary-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius-input);
             color: var(--primary-text);
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
             transition: var(--transition-base);
             text-align: center;
+            backdrop-filter: blur(5px);
         }
 
         .trip-description-input:focus {
             outline: none;
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
         }
 
         /* Trip Date */
@@ -340,9 +358,10 @@
             border-radius: var(--border-radius-input);
             color: var(--primary-text);
             font-size: 16px;
+            backdrop-filter: blur(5px);
         }
 
-        /* Predefined Trips Selector (added) */
+        /* GENERIC Predefined Trips Selector */
         .predefined-trips-group {
             margin: var(--spacing-lg) 0;
             padding: var(--spacing-md) 0;
@@ -371,6 +390,7 @@
             border-radius: var(--border-radius-input);
             color: var(--primary-text);
             font-size: 16px;
+            backdrop-filter: blur(5px);
             cursor: pointer;
         }
 
@@ -393,12 +413,14 @@
         }
 
         .form-header h3 {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--primary-text);
+            font-weight: 600;
         }
 
         .form-header i {
             color: var(--accent-color);
+            font-size: 1.2rem;
         }
 
         .input-row {
@@ -446,11 +468,13 @@
             border-radius: 50%;
             background: var(--tertiary-bg);
             transition: var(--transition-base);
+            border: 1px solid var(--border-color);
         }
 
         .info-icon:hover {
             color: var(--accent-color);
             background: var(--secondary-bg);
+            transform: translateY(-50%) scale(1.1);
         }
 
         .tooltip {
@@ -469,6 +493,7 @@
             transition: var(--transition-base);
             right: 0;
             top: calc(100% + 8px);
+            backdrop-filter: blur(10px);
         }
 
         .info-icon:hover .tooltip {
@@ -485,6 +510,7 @@
             color: var(--primary-text);
             font-size: 16px;
             transition: var(--transition-base);
+            backdrop-filter: blur(5px);
         }
 
         .form-control:focus {
@@ -529,6 +555,7 @@
             border: none;
             outline: none;
             width: 100%;
+            backdrop-filter: blur(5px);
         }
 
         @media (min-width: 768px) {
@@ -594,6 +621,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             transform: translateY(20px);
             transition: var(--transition-base);
+            backdrop-filter: blur(20px);
         }
 
         .modal-overlay.active .modal {
@@ -662,6 +690,7 @@
             border-radius: var(--border-radius-input);
             color: var(--primary-text);
             font-size: 16px;
+            backdrop-filter: blur(5px);
         }
 
         .currency-options {
@@ -686,6 +715,7 @@
             transition: var(--transition-base);
             text-align: center;
             font-weight: 500;
+            backdrop-filter: blur(5px);
         }
 
         .currency-btn:hover {
@@ -712,6 +742,7 @@
             color: var(--primary-text);
             cursor: pointer;
             transition: var(--transition-base);
+            backdrop-filter: blur(5px);
         }
 
         .decimal-btn:hover {
@@ -724,59 +755,6 @@
             border-color: var(--accent-color);
         }
 
-        /* Copy Modal (added) */
-        .copy-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: var(--z-modal);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
-        }
-
-        .copy-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .copy-modal-content {
-            background: var(--secondary-bg);
-            border-radius: var(--border-radius-card);
-            padding: var(--spacing-lg);
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            transform: translateY(20px);
-            transition: var(--transition-base);
-        }
-
-        .copy-modal.active .copy-modal-content {
-            transform: translateY(0);
-        }
-
-        .copy-text {
-            background: var(--tertiary-bg);
-            border-radius: var(--border-radius-input);
-            padding: var(--spacing-md);
-            font-family: monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 300px;
-            overflow-y: auto;
-            margin: var(--spacing-md) 0;
-            border: 1px solid var(--border-color);
-        }
-
         /* History Section */
         .history-section {
             margin-top: var(--spacing-xl);
@@ -787,11 +765,19 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
         }
 
         .history-header h2 {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             color: var(--primary-text);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
         }
 
         .clear-history {
@@ -804,10 +790,13 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-button);
         }
 
         .clear-history:hover {
             color: #ef4444;
+            background: var(--tertiary-bg);
         }
 
         .history-list {
@@ -822,24 +811,29 @@
             padding: var(--spacing-md);
             border: 1px solid var(--border-color);
             transition: var(--transition-base);
+            backdrop-filter: blur(10px);
         }
 
         .history-item:hover {
             background: var(--tertiary-bg);
+            transform: translateY(-2px);
         }
 
         .history-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: var(--spacing-sm);
             flex-wrap: wrap;
             gap: var(--spacing-sm);
         }
 
         .history-title {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--primary-text);
+            flex: 1;
+            min-width: 200px;
         }
 
         .history-total {
@@ -850,9 +844,9 @@
         }
 
         .history-date {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--secondary-text);
-            margin: 4px 0;
+            white-space: nowrap;
         }
 
         .history-details {
@@ -887,8 +881,66 @@
 
         .history-btn {
             flex: 1;
-            padding: 8px;
-            font-size: 0.85rem;
+            padding: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Copy Modal */
+        .copy-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-modal);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-base);
+        }
+
+        .copy-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .copy-modal-content {
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            padding: var(--spacing-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(20px);
+            transition: var(--transition-base);
+            backdrop-filter: blur(20px);
+        }
+
+        .copy-modal.active .copy-modal-content {
+            transform: translateY(0);
+        }
+
+        .copy-text {
+            background: var(--tertiary-bg);
+            border-radius: var(--border-radius-input);
+            padding: var(--spacing-md);
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: var(--spacing-md) 0;
+            border: 1px solid var(--border-color);
         }
 
         /* Toast */
@@ -910,6 +962,8 @@
             font-size: 0.95rem;
             display: flex;
             align-items: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
         }
 
         .toast.show {
@@ -931,6 +985,10 @@
             color: var(--secondary-text);
             font-size: 0.9rem;
             width: 100%;
+            backdrop-filter: blur(10px);
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            padding: var(--spacing-md);
         }
 
         /* Reduced Motion */
@@ -961,6 +1019,7 @@
     </style>
 </head>
 <body>
+    <!-- Main Content -->
     <div class="container">
         <!-- Header with Theme Toggle -->
         <div class="header">
@@ -1001,7 +1060,7 @@
                     </div>
                 </div>
 
-                <!-- Predefined Trips Selector (added) -->
+                <!-- GENERIC Predefined Trips Selector -->
                 <div class="predefined-trips-group">
                     <label for="tripSelect">Load a sample camping trip:</label>
                     <div class="trip-select-row">
@@ -1235,7 +1294,7 @@
         </div>
     </div>
 
-    <!-- Copy Modal (added) -->
+    <!-- Copy Modal -->
     <div class="copy-modal" id="copyModal">
         <div class="copy-modal-content">
             <div class="modal-header">
@@ -1259,7 +1318,7 @@
         <span id="toastMessage">Trip saved successfully!</span>
     </div>
 
-    <!-- PWA Installation Prompt (optional) -->
+    <!-- PWA Installation Prompt (improved) -->
     <div id="installPrompt" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--secondary-bg); color: var(--primary-text); padding: 15px; border-radius: var(--border-radius-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10000; border: 1px solid var(--border-color); backdrop-filter: blur(10px);">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -1277,20 +1336,25 @@
     </div>
 
     <script>
-    // PWA Installation Prompt
+    // PWA Installation Prompt - improved with cooldown
     let deferredPrompt;
     const installPrompt = document.getElementById('installPrompt');
     const installCancel = document.getElementById('installCancel');
     const installAccept = document.getElementById('installAccept');
 
+    // Check if already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!isStandalone) {
+        // Check if user dismissed recently (within 7 days)
         const lastDismissed = localStorage.getItem('installPromptDismissed');
         const oneWeek = 7 * 24 * 60 * 60 * 1000;
         const showPrompt = !lastDismissed || (Date.now() - parseInt(lastDismissed) > oneWeek);
+        
         if (showPrompt) {
-            setTimeout(() => { installPrompt.style.display = 'block'; }, 5000);
+            setTimeout(() => {
+                installPrompt.style.display = 'block';
+            }, 5000);
         }
     }
 
@@ -1303,7 +1367,9 @@
         installPrompt.style.display = 'none';
         if (deferredPrompt) {
             deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+            });
         }
         localStorage.setItem('installPromptAccepted', Date.now());
     });
@@ -1311,6 +1377,7 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
+        // Only show if not already dismissed recently
         const lastDismissed = localStorage.getItem('installPromptDismissed');
         const oneWeek = 7 * 24 * 60 * 60 * 1000;
         if (!lastDismissed || (Date.now() - parseInt(lastDismissed) > oneWeek)) {
@@ -1322,11 +1389,11 @@
     const state = {
         currency: '₱',
         decimals: 0,
-        fuelEfficiency: 40,
+        fuelEfficiency: 40, // km/L
         history: []
     };
 
-    // ---------- SAMPLE TRIPS (easily modifiable) ----------
+    // ---------- SAMPLE TRIPS (easily modifiable, generic) ----------
     const sampleTrips = [
         { name: "River Ranch PH (Tanay)", campsiteFee: 800, foodCost: 150, environmentalFee: 0 },
         { name: "Bulod Campsite (Daraitan, Tanay)", campsiteFee: 300, foodCost: 150, environmentalFee: 0 },
@@ -1359,6 +1426,7 @@
     const toastMessage = document.getElementById('toastMessage');
     const copyText = document.getElementById('copyText');
     
+    // Input Elements
     const tripDescriptionInput = document.getElementById('tripDescription');
     const tripDateInput = document.getElementById('tripDate');
     const distanceInput = document.getElementById('distance');
@@ -1372,6 +1440,7 @@
     const fuelEfficiencyInput = document.getElementById('fuelEfficiency');
     const appNameDiv = document.getElementById('appName');
 
+    // Trip selector elements
     const tripSelect = document.getElementById('tripSelect');
     const loadTripBtn = document.getElementById('loadTripBtn');
 
@@ -1384,23 +1453,34 @@
             localStorage.setItem('appName', appNameDiv.textContent);
         });
 
+        // Populate the sample trip dropdown
         populateTripSelect();
 
+        // Set default date to today
         const today = new Date();
         tripDateInput.value = today.toISOString().split('T')[0];
         
+        // Load saved theme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'light') {
             document.body.classList.add('light-mode');
             updateThemeToggle();
         }
         
+        // Load settings
         loadSettings();
+        
+        // Load history
         loadHistory();
+        
+        // Calculate initial total
         calculateTotal();
+        
+        // Set up event listeners
         setupEventListeners();
     }
 
+    // Populate the sample trips dropdown
     function populateTripSelect() {
         sampleTrips.forEach(trip => {
             const option = document.createElement('option');
@@ -1410,6 +1490,7 @@
         });
     }
 
+    // Load selected sample trip into the form
     function loadSampleTrip() {
         const selectedName = tripSelect.value;
         if (!selectedName) {
@@ -1419,47 +1500,70 @@
         const trip = sampleTrips.find(t => t.name === selectedName);
         if (!trip) return;
 
+        // Set description
         tripDescriptionInput.value = trip.name;
+
+        // Set camping & food fields from trip data
         campsiteFeeInput.value = trip.campsiteFee;
         foodCostInput.value = trip.foodCost;
         environmentalFeeInput.value = trip.environmentalFee;
+
+        // Reset fields that are not part of the sample breakdown
         tentRentalInput.value = 0;
         parkingFeeInput.value = 0;
         miscCostInput.value = 0;
+
+        // Recalculate total
         calculateTotal();
+
         showToast(`Loaded "${trip.name}"`);
     }
 
+    // Set up event listeners
     function setupEventListeners() {
+        // Theme toggle
         themeToggle.addEventListener('click', toggleTheme);
         
+        // Settings modal
         settingsBtn.addEventListener('click', () => toggleModal(settingsModal, true));
         closeModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(settingsModal, false)));
         applySettingsBtn.addEventListener('click', applySettings);
         
+        // Copy modal
         closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
         copyToClipboardBtn.addEventListener('click', copyToClipboard);
         
+        // Save trip
         saveBtn.addEventListener('click', saveTrip);
+        
+        // Clear history
         clearHistoryBtn.addEventListener('click', clearHistory);
         
+        // Input changes
         const inputs = document.querySelectorAll('.form-control, .trip-description-input, .date-input');
         inputs.forEach(input => {
             input.addEventListener('input', calculateTotal);
             input.addEventListener('change', calculateTotal);
         });
         
+        // Close modal on overlay click
         settingsModal.addEventListener('click', (e) => {
-            if (e.target === settingsModal) toggleModal(settingsModal, false);
+            if (e.target === settingsModal) {
+                toggleModal(settingsModal, false);
+            }
         });
         
         copyModal.addEventListener('click', (e) => {
-            if (e.target === copyModal) toggleModal(copyModal, false);
+            if (e.target === copyModal) {
+                toggleModal(copyModal, false);
+            }
         });
 
+        // Load trip button
         loadTripBtn.addEventListener('click', loadSampleTrip);
     }
 
+    // Toggle theme
     function toggleTheme() {
         document.body.classList.toggle('light-mode');
         const isLightMode = document.body.classList.contains('light-mode');
@@ -1467,25 +1571,42 @@
         updateThemeToggle();
     }
 
+    // Update theme toggle button
     function updateThemeToggle() {
         const isLightMode = document.body.classList.contains('light-mode');
         const icon = themeToggle.querySelector('i');
         const text = themeToggle.querySelector('span');
-        icon.className = isLightMode ? 'fas fa-sun' : 'fas fa-moon';
-        text.textContent = isLightMode ? 'Light' : 'Dark';
+        
+        if (isLightMode) {
+            icon.className = 'fas fa-sun';
+            text.textContent = 'Light';
+        } else {
+            icon.className = 'fas fa-moon';
+            text.textContent = 'Dark';
+        }
     }
 
+    // Toggle modal
     function toggleModal(modal, show) {
         if (show) {
             if (modal === settingsModal) {
+                // Load current fuel efficiency
                 fuelEfficiencyInput.value = state.fuelEfficiency;
+
+                // Set active currency button
                 currencyBtns.forEach(btn => {
                     btn.classList.remove('active');
-                    if (btn.dataset.currency === state.currency) btn.classList.add('active');
+                    if (btn.dataset.currency === state.currency) {
+                        btn.classList.add('active');
+                    }
                 });
+
+                // Set active decimal button
                 decimalBtns.forEach(btn => {
                     btn.classList.remove('active');
-                    if (parseInt(btn.dataset.decimals) === state.decimals) btn.classList.add('active');
+                    if (parseInt(btn.dataset.decimals) === state.decimals) {
+                        btn.classList.add('active');
+                    }
                 });
             }
             modal.classList.add('active');
@@ -1494,32 +1615,56 @@
         }
     }
 
+    // Load settings from localStorage
     function loadSettings() {
         const savedCurrency = localStorage.getItem('currency');
         const savedDecimals = localStorage.getItem('decimals');
         const savedFuelEfficiency = localStorage.getItem('fuelEfficiency');
-        if (savedCurrency) state.currency = savedCurrency;
-        if (savedDecimals !== null) state.decimals = parseInt(savedDecimals);
-        if (savedFuelEfficiency !== null) state.fuelEfficiency = parseFloat(savedFuelEfficiency);
+        
+        if (savedCurrency) {
+            state.currency = savedCurrency;
+        }
+        
+        if (savedDecimals !== null) {
+            state.decimals = parseInt(savedDecimals);
+        }
+        
+        if (savedFuelEfficiency !== null) {
+            state.fuelEfficiency = parseFloat(savedFuelEfficiency);
+        }
     }
 
+    // Apply settings
     function applySettings() {
+        // Get fuel efficiency
         state.fuelEfficiency = parseFloat(fuelEfficiencyInput.value) || 40;
+        
+        // Get selected currency
         const activeCurrencyBtn = document.querySelector('.currency-btn.active');
         state.currency = activeCurrencyBtn.dataset.currency;
+        
+        // Get selected decimal places
         const activeDecimalBtn = document.querySelector('.decimal-btn.active');
         state.decimals = parseInt(activeDecimalBtn.dataset.decimals);
         
+        // Save to localStorage
         localStorage.setItem('currency', state.currency);
         localStorage.setItem('decimals', state.decimals);
         localStorage.setItem('fuelEfficiency', state.fuelEfficiency);
         
+        // Recalculate and update display
         calculateTotal();
+        
+        // Close modal
         toggleModal(settingsModal, false);
+        
+        // Show confirmation
         showToast('Settings applied successfully');
     }
 
+    // Calculate total cost
     function calculateTotal() {
+        // Get input values
         const distance = parseFloat(distanceInput.value) || 0;
         const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
         const campsiteFee = parseFloat(campsiteFeeInput.value) || 0;
@@ -1529,14 +1674,28 @@
         const foodCost = parseFloat(foodCostInput.value) || 0;
         const miscCost = parseFloat(miscCostInput.value) || 0;
         
+        // Calculate fuel cost per person
         const fuelCostPerPerson = ((distance / state.fuelEfficiency) * fuelPrice) / 2;
+        
+        // Calculate total per person
         const totalPerPerson = fuelCostPerPerson + campsiteFee + tentRental + parkingFee + environmentalFee + foodCost + miscCost;
+        
+        // Calculate total per pair
         const totalPerPair = totalPerPerson * 2;
         
-        const formatOptions = { minimumFractionDigits: state.decimals, maximumFractionDigits: state.decimals };
-        totalAmount.textContent = `${state.currency} ${totalPerPerson.toLocaleString(undefined, formatOptions)}`;
-        perPerson.textContent = `Per Person: ${state.currency} ${totalPerPerson.toLocaleString(undefined, formatOptions)}`;
-        perPair.textContent = `Per Pair: ${state.currency} ${totalPerPair.toLocaleString(undefined, formatOptions)}`;
+        // Format numbers
+        const formatOptions = {
+            minimumFractionDigits: state.decimals,
+            maximumFractionDigits: state.decimals
+        };
+        
+        const formattedTotalPerPerson = totalPerPerson.toLocaleString(undefined, formatOptions);
+        const formattedTotalPerPair = totalPerPair.toLocaleString(undefined, formatOptions);
+        
+        // Update display
+        totalAmount.textContent = `${state.currency} ${formattedTotalPerPerson}`;
+        perPerson.textContent = `Per Person: ${state.currency} ${formattedTotalPerPerson}`;
+        perPair.textContent = `Per Pair: ${state.currency} ${formattedTotalPerPair}`;
         
         return {
             description: tripDescriptionInput.value || 'Unnamed Trip',
@@ -1557,15 +1716,26 @@
         };
     }
 
+    // Format date for display
     function formatDisplayDate(dateString) {
         if (!dateString) return 'No date';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
     }
 
+    // Generate formatted text for sharing
     function generateShareText(trip) {
-        const formatOptions = { minimumFractionDigits: state.decimals, maximumFractionDigits: state.decimals };
+        const formatOptions = {
+            minimumFractionDigits: state.decimals,
+            maximumFractionDigits: state.decimals
+        };
+        
         const dateStr = formatDisplayDate(trip.date);
+        
         return `🏍️ ${trip.description} - ${dateStr}
 
 💰 TOTAL: ${state.currency} ${trip.perPerson.toLocaleString(undefined, formatOptions)} per person
@@ -1587,26 +1757,39 @@
 ⚙️ Calculated with MotorTrip Calc`;
     }
 
+    // Show copy modal
     function showCopyModal(trip) {
-        copyText.textContent = generateShareText(trip);
+        const shareText = generateShareText(trip);
+        copyText.textContent = shareText;
         toggleModal(copyModal, true);
     }
 
+    // Copy to clipboard
     function copyToClipboard() {
-        navigator.clipboard.writeText(copyText.textContent).then(() => {
+        const text = copyText.textContent;
+        navigator.clipboard.writeText(text).then(() => {
             showToast('Copied to clipboard!');
             toggleModal(copyModal, false);
-        }).catch(() => showToast('Failed to copy to clipboard'));
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            showToast('Failed to copy to clipboard');
+        });
     }
 
+    // Save trip to history
     function saveTrip() {
+        // Get trip description
         const description = tripDescriptionInput.value.trim();
         if (!description) {
             showToast('Please enter a trip description');
             tripDescriptionInput.focus();
             return;
         }
+        
+        // Calculate current trip
         const tripData = calculateTotal();
+        
+        // Create history item
         const historyItem = {
             id: Date.now(),
             date: tripData.date,
@@ -1616,12 +1799,21 @@
             decimals: state.decimals,
             savedAt: new Date().toISOString()
         };
+        
+        // Add to history
         state.history.unshift(historyItem);
+        
+        // Save to localStorage
         saveHistory();
+        
+        // Update history display
         updateHistoryDisplay();
+        
+        // Show confirmation
         showToast(`"${description}" saved to history`);
     }
 
+    // Load history from localStorage
     function loadHistory() {
         const savedHistory = localStorage.getItem('tripHistory');
         if (savedHistory) {
@@ -1630,51 +1822,121 @@
         }
     }
 
+    // Save history to localStorage
     function saveHistory() {
         localStorage.setItem('tripHistory', JSON.stringify(state.history));
     }
 
+    // Update history display
     function updateHistoryDisplay() {
+        // Clear current history
         historyList.innerHTML = '';
+        
+        // Check if history is empty
         if (state.history.length === 0) {
-            historyList.innerHTML = `<div class="history-item empty-history"><div class="history-date">No trips saved yet</div><div class="history-details"><div class="history-detail"><span>Save a trip to see it here</span></div></div></div>`;
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'history-item empty-history';
+            emptyItem.innerHTML = `
+                <div class="history-date">No trips saved yet</div>
+                <div class="history-details">
+                    <div class="history-detail">
+                        <span>Save a trip to see it here</span>
+                    </div>
+                </div>
+            `;
+            historyList.appendChild(emptyItem);
             return;
         }
+        
+        // Add history items
         state.history.forEach(item => {
-            const formatOptions = { minimumFractionDigits: item.decimals || 0, maximumFractionDigits: item.decimals || 0 };
+            const formatOptions = {
+                minimumFractionDigits: item.decimals || 0,
+                maximumFractionDigits: item.decimals || 0
+            };
+            
+            // Format date for display
             const displayDate = formatDisplayDate(item.date);
-            const el = document.createElement('div');
-            el.className = 'history-item';
-            el.innerHTML = `
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
                 <div class="history-header-row">
                     <div class="history-title">${item.description}</div>
                     <div class="history-total">${item.currency || '₱'} ${item.perPerson.toLocaleString(undefined, formatOptions)}</div>
                     <div class="history-date">${displayDate}</div>
                 </div>
                 <div class="history-details">
-                    <div class="history-detail"><span>Distance:</span><span>${item.distance} km</span></div>
-                    <div class="history-detail"><span>Fuel:</span><span>${item.currency || '₱'} ${item.fuelCost.toLocaleString(undefined, formatOptions)}</span></div>
-                    <div class="history-detail"><span>Camping:</span><span>${item.currency || '₱'} ${(item.campsiteFee + item.tentRental + item.parkingFee + item.environmentalFee).toLocaleString(undefined, formatOptions)}</span></div>
-                    <div class="history-detail"><span>Food:</span><span>${item.currency || '₱'} ${item.foodCost.toLocaleString(undefined, formatOptions)}</span></div>
-                    <div class="history-detail"><span>Other:</span><span>${item.currency || '₱'} ${item.totalMisc.toLocaleString(undefined, formatOptions)}</span></div>
-                    <div class="history-detail"><span>Fuel Eff:</span><span>${item.fuelEfficiency} km/L</span></div>
+                    <div class="history-detail">
+                        <span>Distance:</span>
+                        <span>${item.distance} km</span>
+                    </div>
+                    <div class="history-detail">
+                        <span>Fuel:</span>
+                        <span>${item.currency || '₱'} ${item.fuelCost.toLocaleString(undefined, formatOptions)}</span>
+                    </div>
+                    <div class="history-detail">
+                        <span>Camping:</span>
+                        <span>${item.currency || '₱'} ${(item.campsiteFee + item.tentRental + item.parkingFee + item.environmentalFee).toLocaleString(undefined, formatOptions)}</span>
+                    </div>
+                    <div class="history-detail">
+                        <span>Food:</span>
+                        <span>${item.currency || '₱'} ${item.foodCost.toLocaleString(undefined, formatOptions)}</span>
+                    </div>
+                    <div class="history-detail">
+                        <span>Other:</span>
+                        <span>${item.currency || '₱'} ${item.totalMisc.toLocaleString(undefined, formatOptions)}</span>
+                    </div>
+                    <div class="history-detail">
+                        <span>Fuel Eff:</span>
+                        <span>${item.fuelEfficiency} km/L</span>
+                    </div>
                 </div>
                 <div class="history-actions">
-                    <button class="btn btn-secondary history-btn load-trip-btn" data-id="${item.id}"><i class="fas fa-undo"></i> Load</button>
-                    <button class="btn btn-secondary history-btn copy-trip-btn" data-id="${item.id}"><i class="fas fa-copy"></i> Copy</button>
-                    <button class="btn btn-secondary history-btn delete-trip-btn" data-id="${item.id}"><i class="fas fa-trash-alt"></i> Delete</button>
+                    <button class="btn btn-secondary history-btn load-trip-btn" data-id="${item.id}">
+                        <i class="fas fa-undo"></i> Load
+                    </button>
+                    <button class="btn btn-secondary history-btn copy-trip-btn" data-id="${item.id}">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button class="btn btn-secondary history-btn delete-trip-btn" data-id="${item.id}">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
                 </div>
             `;
-            historyList.appendChild(el);
+            
+            historyList.appendChild(historyItem);
         });
-        document.querySelectorAll('.load-trip-btn').forEach(btn => btn.addEventListener('click', e => loadTrip(parseInt(e.currentTarget.dataset.id))));
-        document.querySelectorAll('.copy-trip-btn').forEach(btn => btn.addEventListener('click', e => copyTrip(parseInt(e.currentTarget.dataset.id))));
-        document.querySelectorAll('.delete-trip-btn').forEach(btn => btn.addEventListener('click', e => deleteTrip(parseInt(e.currentTarget.dataset.id))));
+        
+        // Add event listeners to history buttons
+        document.querySelectorAll('.load-trip-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.dataset.id);
+                loadTrip(id);
+            });
+        });
+        
+        document.querySelectorAll('.copy-trip-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.dataset.id);
+                copyTrip(id);
+            });
+        });
+        
+        document.querySelectorAll('.delete-trip-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.dataset.id);
+                deleteTrip(id);
+            });
+        });
     }
 
+    // Load trip from history
     function loadTrip(id) {
         const trip = state.history.find(item => item.id === id);
         if (!trip) return;
+        
+        // Update inputs
         tripDescriptionInput.value = trip.description;
         tripDateInput.value = trip.date;
         distanceInput.value = trip.distance;
@@ -1685,30 +1947,47 @@
         environmentalFeeInput.value = trip.environmentalFee;
         foodCostInput.value = trip.foodCost;
         miscCostInput.value = trip.totalMisc;
+        
+        // Update fuel efficiency in settings
         state.fuelEfficiency = trip.fuelEfficiency;
+        
+        // Update currency and decimals
         if (trip.currency) state.currency = trip.currency;
         if (trip.decimals !== undefined) state.decimals = trip.decimals;
+        
+        // Recalculate
         calculateTotal();
+        
+        // Show confirmation
         showToast(`"${trip.description}" loaded from history`);
     }
 
+    // Copy trip details
     function copyTrip(id) {
         const trip = state.history.find(item => item.id === id);
-        if (trip) showCopyModal(trip);
+        if (!trip) return;
+        
+        showCopyModal(trip);
     }
 
+    // Delete trip from history
     function deleteTrip(id) {
         const trip = state.history.find(item => item.id === id);
-        if (trip && confirm(`Delete "${trip.description}"?`)) {
+        if (!trip) return;
+        
+        if (confirm(`Are you sure you want to delete "${trip.description}"?`)) {
             state.history = state.history.filter(item => item.id !== id);
             saveHistory();
             updateHistoryDisplay();
-            showToast(`"${trip.description}" deleted`);
+            showToast(`"${trip.description}" deleted from history`);
         }
     }
 
+    // Clear all history
     function clearHistory() {
-        if (state.history.length && confirm('Clear all trip history?')) {
+        if (state.history.length === 0) return;
+        
+        if (confirm('Are you sure you want to clear all trip history?')) {
             state.history = [];
             saveHistory();
             updateHistoryDisplay();
@@ -1716,18 +1995,29 @@
         }
     }
 
+    // Show toast notification
     function showToast(message) {
         toastMessage.textContent = message;
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
     }
 
+    // Initialize the app when DOM is loaded
     document.addEventListener('DOMContentLoaded', init);
 
-    // Service Worker
+    // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('service-worker.js').catch(console.log);
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(function(registration) {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('Service Worker registration failed:', error);
+                });
         });
     }
     </script>
