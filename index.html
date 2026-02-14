@@ -29,7 +29,6 @@
     <style>
         /* CSS Variables - Blue Theme */
         :root {
-            /* Color scheme - Dark mode */
             --primary-bg: #0a0a0a;
             --secondary-bg: #1a1a1a;
             --tertiary-bg: #2a2a2a;
@@ -38,7 +37,6 @@
             --accent-color: #3b82f6;
             --border-color: rgba(255, 255, 255, 0.1);
             
-            /* Light mode overrides */
             --primary-bg-light: #ffffff;
             --secondary-bg-light: #f8f9fa;
             --tertiary-bg-light: #e9ecef;
@@ -46,19 +44,16 @@
             --secondary-text-light: #6c757d;
             --border-color-light: rgba(0, 0, 0, 0.1);
             
-            /* Theme color variations - Blue Theme */
             --theme-1: #3b82f6;
             --theme-2: #2563eb;
             --theme-3: #1d4ed8;
             --theme-4: #dbeafe;
             
-            /* Glowing border colors - Blue Theme */
             --glow-color-1: #3b82f6;
             --glow-color-2: #2563eb;
             --glow-color-3: #60a5fa;
             --glow-color-4: #93c5fd;
             
-            /* Design tokens */
             --border-radius-card: 16px;
             --border-radius-button: 12px;
             --border-radius-input: 12px;
@@ -67,14 +62,12 @@
             --font-size-base: 16px;
             --line-height-base: 1.6;
             
-            /* Spacing */
             --spacing-xs: 4px;
             --spacing-sm: 8px;
             --spacing-md: 16px;
             --spacing-lg: 24px;
             --spacing-xl: 32px;
             
-            /* Z-index layers */
             --z-background: 0;
             --z-content: 10;
             --z-overlay: 100;
@@ -91,21 +84,18 @@
             --border-color: var(--border-color-light);
         }
 
-        /* Animated motorcycle icon */
         @keyframes motorcycle-move {
             0%, 100% { transform: translateX(0) rotate(0deg); }
             25% { transform: translateX(5px) rotate(5deg); }
             75% { transform: translateX(-5px) rotate(-5deg); }
         }
 
-        /* Pulse animation for map icon */
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.2); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -292,7 +282,7 @@
         .map-icon {
             color: var(--accent-color);
             cursor: pointer;
-            font-size: 1.8rem; /* bigger */
+            font-size: 1.8rem;
             transition: transform 0.2s;
             animation: pulse 2s infinite ease-in-out;
         }
@@ -365,29 +355,29 @@
             font-size: 16px;
         }
 
-        /* Predefined Trips Selector + Import button */
-        .predefined-trips-group {
+        /* Campsite Selector + Add button */
+        .campsite-section {
             margin: var(--spacing-lg) 0;
             padding: var(--spacing-md) 0;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
         }
 
-        .predefined-trips-group label {
+        .campsite-section label {
             display: block;
             margin-bottom: var(--spacing-sm);
             color: var(--secondary-text);
             font-weight: 500;
         }
 
-        .trip-select-row {
+        .campsite-row {
             display: flex;
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
         }
 
-        .trip-select-row select {
+        .campsite-row select {
             flex: 2;
             min-width: 200px;
             padding: 14px 16px;
@@ -399,18 +389,18 @@
             cursor: pointer;
         }
 
-        .trip-select-row button {
+        .campsite-row button {
             width: auto;
             padding: 14px 20px;
             white-space: nowrap;
         }
 
-        .import-btn {
+        .add-btn {
             background: var(--tertiary-bg);
             border: 1px solid var(--accent-color);
             color: var(--accent-color);
         }
-        .import-btn:hover {
+        .add-btn:hover {
             background: var(--accent-color);
             color: white;
         }
@@ -759,9 +749,22 @@
             border-color: var(--accent-color);
         }
 
-        /* Map Modal (new style) */
+        /* Map Modal - with embedded map and Google link */
         .map-modal-content {
-            max-width: 500px;
+            max-width: 700px;
+        }
+        .map-container {
+            width: 100%;
+            height: 350px;
+            margin: 15px 0;
+            border-radius: var(--border-radius-input);
+            overflow: hidden;
+            background: var(--tertiary-bg);
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
         .coords-display {
             background: var(--tertiary-bg);
@@ -806,33 +809,52 @@
         .google-maps-btn:hover {
             background: #3367D6;
         }
+        .campsite-image {
+            width: 144px;
+            height: 192px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 10px auto;
+            display: block;
+            border: 2px solid var(--accent-color);
+        }
 
-        /* Import Modal */
-        .import-textarea {
+        /* Add Campsite Modal */
+        .add-modal-content {
+            max-width: 500px;
+        }
+        .add-form-row {
+            margin-bottom: 15px;
+        }
+        .add-form-row label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--secondary-text);
+        }
+        .add-form-row input, .add-form-row textarea {
             width: 100%;
-            min-height: 200px;
+            padding: 10px;
             background: var(--tertiary-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius-input);
             color: var(--primary-text);
-            padding: 12px;
-            font-family: monospace;
-            font-size: 14px;
-            margin: 15px 0;
-            resize: vertical;
         }
-        .import-prompt {
+        .image-preview {
+            width: 144px;
+            height: 192px;
+            border-radius: 12px;
             background: var(--tertiary-bg);
-            padding: 12px;
-            border-radius: var(--border-radius-input);
-            font-size: 0.9rem;
-            border-left: 3px solid var(--accent-color);
-            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            overflow: hidden;
+            border: 2px dashed var(--accent-color);
         }
-        .import-prompt code {
-            background: rgba(0,0,0,0.3);
-            padding: 2px 4px;
-            border-radius: 4px;
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         /* Copy Modal */
@@ -1117,18 +1139,18 @@
                     </div>
                 </div>
 
-                <!-- Predefined Trips Selector + Import button -->
-                <div class="predefined-trips-group">
-                    <label for="tripSelect">Load a sample camping trip:</label>
-                    <div class="trip-select-row">
+                <!-- Campsite Selector + Add button -->
+                <div class="campsite-section">
+                    <label for="tripSelect">Load a campsite:</label>
+                    <div class="campsite-row">
                         <select id="tripSelect" class="form-control">
-                            <option value="">-- Select an example --</option>
+                            <option value="">-- Select a campsite --</option>
                         </select>
                         <button type="button" class="btn btn-secondary" id="loadTripBtn">
                             <i class="fas fa-download"></i> Load
                         </button>
-                        <button type="button" class="btn btn-secondary import-btn" id="importBtn">
-                            <i class="fas fa-file-import"></i> Import
+                        <button type="button" class="btn btn-secondary add-btn" id="addCampsiteBtn">
+                            <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
                 </div>
@@ -1354,18 +1376,20 @@
         </div>
     </div>
 
-    <!-- Map Modal (now with Google Maps link) -->
+    <!-- Map Modal (with embedded OpenStreetMap and Google Maps link) -->
     <div class="modal-overlay" id="mapModal">
         <div class="modal map-modal-content">
             <div class="modal-header">
                 <h2><i class="fas fa-map-marked-alt"></i> <span id="mapLocationName">Location</span></h2>
                 <button class="close-modal" id="closeMapModalBtn">&times;</button>
             </div>
+            <div class="map-container" id="mapContainer"></div>
             <div class="coords-display" id="mapCoords"></div>
             <div class="rating-info" id="ratingInfo" style="display: none;">
                 <span class="rating-stars" id="ratingStars"></span>
                 <span class="review-count" id="reviewCount"></span>
             </div>
+            <img id="campsiteImage" class="campsite-image" style="display: none;" alt="Campsite">
             <a href="#" target="_blank" id="googleMapsLink" class="google-maps-btn">
                 <i class="fab fa-google"></i> Open in Google Maps
             </a>
@@ -1375,35 +1399,56 @@
         </div>
     </div>
 
-    <!-- Import Modal -->
-    <div class="modal-overlay" id="importModal">
-        <div class="modal">
+    <!-- Add Campsite Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal add-modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-file-import"></i> Import Trips</h2>
-                <button class="close-modal" id="closeImportModalBtn">&times;</button>
+                <h2><i class="fas fa-plus-circle"></i> Add New Campsite</h2>
+                <button class="close-modal" id="closeAddModalBtn">&times;</button>
             </div>
-            <div class="import-prompt">
-                <p>Paste JSON array from LLM using this format:</p>
-                <code>
-                [
-                  {
-                    "name": "Campsite Name",
-                    "campsiteFee": 500,
-                    "foodCost": 150,
-                    "environmentalFee": 0,
-                    "lat": 14.6548,
-                    "lon": 121.3411,
-                    "rating": 4.5,
-                    "reviews": 120
-                  }
-                ]
-                </code>
-                <p style="margin-top:8px;">Only <strong>name</strong>, <strong>campsiteFee</strong>, and <strong>foodCost</strong> are required. Others optional.</p>
+            <div class="add-form-row">
+                <label>Campsite Name</label>
+                <input type="text" id="addName" placeholder="e.g., River Ranch">
             </div>
-            <textarea id="importData" class="import-textarea" placeholder='Paste JSON here...'></textarea>
+            <div class="add-form-row">
+                <label>Latitude</label>
+                <input type="number" step="any" id="addLat" placeholder="14.6548">
+            </div>
+            <div class="add-form-row">
+                <label>Longitude</label>
+                <input type="number" step="any" id="addLon" placeholder="121.3411">
+            </div>
+            <div class="add-form-row">
+                <label>Campsite Fee (per person) ₱</label>
+                <input type="number" id="addCampsiteFee" value="400">
+            </div>
+            <div class="add-form-row">
+                <label>Food Cost (per person) ₱</label>
+                <input type="number" id="addFoodCost" value="150">
+            </div>
+            <div class="add-form-row">
+                <label>Environmental Fee ₱</label>
+                <input type="number" id="addEnvFee" value="0">
+            </div>
+            <div class="add-form-row">
+                <label>Rating (optional)</label>
+                <input type="number" step="0.1" id="addRating" placeholder="4.5">
+            </div>
+            <div class="add-form-row">
+                <label>Number of Reviews (optional)</label>
+                <input type="number" id="addReviews" placeholder="120">
+            </div>
+            <div class="add-form-row">
+                <label>Picture (optional)</label>
+                <input type="file" id="addImage" accept="image/*">
+                <div class="image-preview" id="imagePreview">
+                    <img id="previewImg" style="display: none;">
+                    <span id="previewPlaceholder">No image</span>
+                </div>
+            </div>
             <div class="button-group">
-                <button type="button" class="btn btn-secondary" id="closeImportModalBtn2">Cancel</button>
-                <button type="button" class="btn btn-primary" id="processImportBtn">Import Trips</button>
+                <button type="button" class="btn btn-secondary" id="closeAddModalBtn2">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCampsiteBtn">Save Campsite</button>
             </div>
         </div>
     </div>
@@ -1432,7 +1477,7 @@
         <span id="toastMessage">Trip saved successfully!</span>
     </div>
 
-    <!-- PWA Installation Prompt (optional) -->
+    <!-- PWA Installation Prompt -->
     <div id="installPrompt" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--secondary-bg); color: var(--primary-text); padding: 15px; border-radius: var(--border-radius-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10000; border: 1px solid var(--border-color); backdrop-filter: blur(10px);">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -1497,7 +1542,7 @@
         decimals: 0,
         fuelEfficiency: 40,
         history: [],
-        importedTrips: []   // will be merged with default trips
+        customTrips: []   // user-added campsites
     };
 
     // Current trip coordinates (if known)
@@ -1506,7 +1551,8 @@
         lon: null,
         name: 'Tanay, Rizal',
         rating: null,
-        reviews: null
+        reviews: null,
+        image: null
     };
 
     // ---------- DEFAULT SAMPLE TRIPS (built-in) ----------
@@ -1519,7 +1565,8 @@
             lat: 14.6548,
             lon: 121.3411,
             rating: 4.7,
-            reviews: 74
+            reviews: 74,
+            image: null
         },
         { 
             name: "Bulod Campsite (Daraitan, Tanay)", 
@@ -1529,7 +1576,8 @@
             lat: 14.6111,
             lon: 121.4172,
             rating: null,
-            reviews: null
+            reviews: null,
+            image: null
         },
         { 
             name: "Camp Irog Daraitan (Tanay)", 
@@ -1539,7 +1587,8 @@
             lat: 14.6067,
             lon: 121.4285,
             rating: 5.0,
-            reviews: 23
+            reviews: 23,
+            image: null
         },
         { 
             name: "Daranak/Batlag Falls area (Tanay)", 
@@ -1549,7 +1598,8 @@
             lat: 14.5450,
             lon: 121.2950,
             rating: 4.4,
-            reviews: 1300
+            reviews: 1300,
+            image: null
         },
         { 
             name: "Atburan Camping Ground (Tanay)", 
@@ -1559,7 +1609,8 @@
             lat: 14.6425,
             lon: 121.4350,
             rating: null,
-            reviews: null
+            reviews: null,
+            image: null
         },
         { 
             name: "Luklukan Camp and Chill (Tanay)", 
@@ -1569,7 +1620,8 @@
             lat: 14.5886,
             lon: 121.3325,
             rating: 4.9,
-            reviews: 18
+            reviews: 18,
+            image: null
         },
         { 
             name: "Blessed HM Campsite (Tanay)", 
@@ -1579,7 +1631,8 @@
             lat: 14.6083,
             lon: 121.3283,
             rating: 5.0,
-            reviews: 1
+            reviews: 1,
+            image: null
         },
         { 
             name: "Camp Majai Riverfront (Tanay)", 
@@ -1589,12 +1642,13 @@
             lat: 14.6317,
             lon: 121.3450,
             rating: 4.9,
-            reviews: 10
+            reviews: 10,
+            image: null
         }
     ];
 
-    // Combined trips (default + imported)
-    let allTrips = [...defaultTrips];
+    // Combined campsites (default + custom)
+    let allCampsites = [...defaultTrips];
 
     // DOM Elements
     const themeToggle = document.getElementById('themeToggle');
@@ -1604,14 +1658,13 @@
     const settingsModal = document.getElementById('settingsModal');
     const mapModal = document.getElementById('mapModal');
     const copyModal = document.getElementById('copyModal');
-    const importModal = document.getElementById('importModal');
+    const addModal = document.getElementById('addModal');
     const closeModalBtns = document.querySelectorAll('#closeModalBtn, #closeModalBtn2');
     const closeMapModalBtns = document.querySelectorAll('#closeMapModalBtn, #closeMapModalBtn2');
     const closeCopyModalBtns = document.querySelectorAll('#closeCopyModalBtn, #closeCopyModalBtn2');
-    const closeImportModalBtns = document.querySelectorAll('#closeImportModalBtn, #closeImportModalBtn2');
+    const closeAddModalBtns = document.querySelectorAll('#closeAddModalBtn, #closeAddModalBtn2');
     const applySettingsBtn = document.getElementById('applySettingsBtn');
     const copyToClipboardBtn = document.getElementById('copyToClipboardBtn');
-    const processImportBtn = document.getElementById('processImportBtn');
     const currencyBtns = document.querySelectorAll('.currency-btn');
     const decimalBtns = document.querySelectorAll('.decimal-btn');
     const totalAmount = document.getElementById('totalAmount');
@@ -1637,16 +1690,31 @@
 
     const tripSelect = document.getElementById('tripSelect');
     const loadTripBtn = document.getElementById('loadTripBtn');
-    const importBtn = document.getElementById('importBtn');
-    const importData = document.getElementById('importData');
+    const addCampsiteBtn = document.getElementById('addCampsiteBtn');
+
+    // Add modal fields
+    const addName = document.getElementById('addName');
+    const addLat = document.getElementById('addLat');
+    const addLon = document.getElementById('addLon');
+    const addCampsiteFee = document.getElementById('addCampsiteFee');
+    const addFoodCost = document.getElementById('addFoodCost');
+    const addEnvFee = document.getElementById('addEnvFee');
+    const addRating = document.getElementById('addRating');
+    const addReviews = document.getElementById('addReviews');
+    const addImage = document.getElementById('addImage');
+    const previewImg = document.getElementById('previewImg');
+    const previewPlaceholder = document.getElementById('previewPlaceholder');
+    const saveCampsiteBtn = document.getElementById('saveCampsiteBtn');
 
     // Map elements
     const mapIcon = document.getElementById('mapIcon');
     const mapLocationName = document.getElementById('mapLocationName');
+    const mapContainer = document.getElementById('mapContainer');
     const mapCoords = document.getElementById('mapCoords');
     const ratingInfo = document.getElementById('ratingInfo');
     const ratingStars = document.getElementById('ratingStars');
     const reviewCount = document.getElementById('reviewCount');
+    const campsiteImage = document.getElementById('campsiteImage');
     const googleMapsLink = document.getElementById('googleMapsLink');
 
     // Initialize the app
@@ -1658,10 +1726,10 @@
             localStorage.setItem('appName', appNameDiv.textContent);
         });
 
-        // Load imported trips from localStorage
-        loadImportedTrips();
+        // Load custom campsites from localStorage
+        loadCustomTrips();
 
-        // Populate dropdown with all trips
+        // Populate dropdown with all campsites
         populateTripSelect();
 
         const today = new Date();
@@ -1679,34 +1747,31 @@
         setupEventListeners();
     }
 
-    function loadImportedTrips() {
-        const saved = localStorage.getItem('importedTrips');
+    function loadCustomTrips() {
+        const saved = localStorage.getItem('customTrips');
         if (saved) {
             try {
-                state.importedTrips = JSON.parse(saved);
-                // Merge with defaults, avoid duplicates by name? Simple: just concatenate.
-                allTrips = [...defaultTrips, ...state.importedTrips];
+                state.customTrips = JSON.parse(saved);
+                allCampsites = [...defaultTrips, ...state.customTrips];
             } catch (e) {
-                console.warn('Failed to load imported trips', e);
+                console.warn('Failed to load custom trips', e);
             }
         } else {
-            allTrips = [...defaultTrips];
+            allCampsites = [...defaultTrips];
         }
     }
 
-    function saveImportedTrips() {
-        localStorage.setItem('importedTrips', JSON.stringify(state.importedTrips));
-        // Refresh the combined list
-        allTrips = [...defaultTrips, ...state.importedTrips];
+    function saveCustomTrips() {
+        localStorage.setItem('customTrips', JSON.stringify(state.customTrips));
+        allCampsites = [...defaultTrips, ...state.customTrips];
         populateTripSelect();
     }
 
     function populateTripSelect() {
-        // Clear existing options except the first placeholder
         while (tripSelect.options.length > 1) {
             tripSelect.remove(1);
         }
-        allTrips.forEach(trip => {
+        allCampsites.forEach(trip => {
             const option = document.createElement('option');
             option.value = trip.name;
             option.textContent = trip.name;
@@ -1714,13 +1779,13 @@
         });
     }
 
-    function loadSampleTrip() {
+    function loadSelectedCampsite() {
         const selectedName = tripSelect.value;
         if (!selectedName) {
-            showToast('Please select a trip');
+            showToast('Please select a campsite');
             return;
         }
-        const trip = allTrips.find(t => t.name === selectedName);
+        const trip = allCampsites.find(t => t.name === selectedName);
         if (!trip) return;
 
         tripDescriptionInput.value = trip.name;
@@ -1731,37 +1796,37 @@
         parkingFeeInput.value = 0;
         miscCostInput.value = 0;
         
-        // Update current trip coordinates
         currentTrip = {
             lat: trip.lat || null,
             lon: trip.lon || null,
             name: trip.name,
             rating: trip.rating || null,
-            reviews: trip.reviews || null
+            reviews: trip.reviews || null,
+            image: trip.image || null
         };
         
         calculateTotal();
         showToast(`Loaded "${trip.name}"`);
     }
 
-    // Show map modal with Google Maps link
+    // Show map modal with embedded OSM and Google link
     function showMap() {
         let lat = currentTrip.lat;
         let lon = currentTrip.lon;
         let name = currentTrip.name;
 
-        // If no coordinates, default to Tanay town center
         if (!lat || !lon) {
             lat = 14.5869;
             lon = 121.2844;
             name = 'Tanay, Rizal (default)';
         }
 
+        const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.01}%2C${lat-0.01}%2C${lon+0.01}%2C${lat+0.01}&layer=mapnik&marker=${lat}%2C${lon}`;
+        mapContainer.innerHTML = `<iframe src="${osmUrl}" style="width:100%; height:100%; border:0" allowfullscreen loading="lazy"></iframe>`;
         mapLocationName.textContent = name;
         mapCoords.textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
         googleMapsLink.href = `https://maps.google.com/?daddr=${lat},${lon}`;
 
-        // Show rating if available
         if (currentTrip.rating) {
             ratingInfo.style.display = 'flex';
             const fullStars = Math.floor(currentTrip.rating);
@@ -1772,49 +1837,75 @@
             ratingInfo.style.display = 'none';
         }
 
+        if (currentTrip.image) {
+            campsiteImage.src = currentTrip.image;
+            campsiteImage.style.display = 'block';
+        } else {
+            campsiteImage.style.display = 'none';
+        }
+
         toggleModal(mapModal, true);
     }
 
-    // Import trips from JSON
-    function importTrips() {
-        const raw = importData.value.trim();
-        if (!raw) {
-            showToast('Please paste some JSON data');
-            return;
+    // Handle image preview in add modal
+    addImage.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                previewImg.src = ev.target.result;
+                previewImg.style.display = 'block';
+                previewPlaceholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewImg.style.display = 'none';
+            previewPlaceholder.style.display = 'block';
         }
-        try {
-            const imported = JSON.parse(raw);
-            if (!Array.isArray(imported)) {
-                showToast('Data must be an array');
-                return;
-            }
-            // Basic validation
-            const validTrips = [];
-            for (const item of imported) {
-                if (!item.name || typeof item.campsiteFee !== 'number' || typeof item.foodCost !== 'number') {
-                    showToast('Each trip must have name (string), campsiteFee (number), foodCost (number)');
-                    return;
-                }
-                // Optional fields
-                validTrips.push({
-                    name: item.name,
-                    campsiteFee: item.campsiteFee,
-                    foodCost: item.foodCost,
-                    environmentalFee: item.environmentalFee || 0,
-                    lat: item.lat || null,
-                    lon: item.lon || null,
-                    rating: item.rating || null,
-                    reviews: item.reviews || null
-                });
-            }
-            // Append to importedTrips (avoid duplicates by name? optional)
-            state.importedTrips = [...state.importedTrips, ...validTrips];
-            saveImportedTrips();
-            toggleModal(importModal, false);
-            showToast(`Imported ${validTrips.length} trip(s)`);
-        } catch (e) {
-            showToast('Invalid JSON: ' + e.message);
-        }
+    });
+
+    // Save new campsite
+    function saveNewCampsite() {
+        const name = addName.value.trim();
+        if (!name) { showToast('Name is required'); return; }
+        const lat = parseFloat(addLat.value);
+        const lon = parseFloat(addLon.value);
+        if (isNaN(lat) || isNaN(lon)) { showToast('Valid coordinates required'); return; }
+        const campsiteFee = parseFloat(addCampsiteFee.value) || 0;
+        const foodCost = parseFloat(addFoodCost.value) || 0;
+        const envFee = parseFloat(addEnvFee.value) || 0;
+        const rating = addRating.value ? parseFloat(addRating.value) : null;
+        const reviews = addReviews.value ? parseInt(addReviews.value) : null;
+        const image = previewImg.src && previewImg.src.startsWith('data:') ? previewImg.src : null;
+
+        const newTrip = {
+            name,
+            lat,
+            lon,
+            campsiteFee,
+            foodCost,
+            environmentalFee: envFee,
+            rating,
+            reviews,
+            image
+        };
+
+        state.customTrips.push(newTrip);
+        saveCustomTrips();
+        toggleModal(addModal, false);
+        showToast(`Added "${name}"`);
+        // Clear form
+        addName.value = '';
+        addLat.value = '';
+        addLon.value = '';
+        addCampsiteFee.value = '400';
+        addFoodCost.value = '150';
+        addEnvFee.value = '0';
+        addRating.value = '';
+        addReviews.value = '';
+        addImage.value = '';
+        previewImg.style.display = 'none';
+        previewPlaceholder.style.display = 'block';
     }
 
     function setupEventListeners() {
@@ -1829,8 +1920,8 @@
         closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
         copyToClipboardBtn.addEventListener('click', copyToClipboard);
         
-        closeImportModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(importModal, false)));
-        processImportBtn.addEventListener('click', importTrips);
+        closeAddModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(addModal, false)));
+        saveCampsiteBtn.addEventListener('click', saveNewCampsite);
         
         saveBtn.addEventListener('click', saveTrip);
         clearHistoryBtn.addEventListener('click', clearHistory);
@@ -1853,17 +1944,27 @@
             if (e.target === copyModal) toggleModal(copyModal, false);
         });
         
-        importModal.addEventListener('click', (e) => {
-            if (e.target === importModal) toggleModal(importModal, false);
+        addModal.addEventListener('click', (e) => {
+            if (e.target === addModal) toggleModal(addModal, false);
         });
 
-        loadTripBtn.addEventListener('click', loadSampleTrip);
-        importBtn.addEventListener('click', () => {
-            importData.value = ''; // clear previous
-            toggleModal(importModal, true);
+        loadTripBtn.addEventListener('click', loadSelectedCampsite);
+        addCampsiteBtn.addEventListener('click', () => {
+            // Reset form
+            addName.value = '';
+            addLat.value = '';
+            addLon.value = '';
+            addCampsiteFee.value = '400';
+            addFoodCost.value = '150';
+            addEnvFee.value = '0';
+            addRating.value = '';
+            addReviews.value = '';
+            addImage.value = '';
+            previewImg.style.display = 'none';
+            previewPlaceholder.style.display = 'block';
+            toggleModal(addModal, true);
         });
 
-        // Map icon click
         mapIcon.addEventListener('click', showMap);
     }
 
@@ -2022,11 +2123,11 @@
             currency: state.currency,
             decimals: state.decimals,
             savedAt: new Date().toISOString(),
-            // Save current coordinates
             lat: currentTrip.lat,
             lon: currentTrip.lon,
             rating: currentTrip.rating,
-            reviews: currentTrip.reviews
+            reviews: currentTrip.reviews,
+            image: currentTrip.image
         };
         state.history.unshift(historyItem);
         saveHistory();
@@ -2101,13 +2202,13 @@
         if (trip.currency) state.currency = trip.currency;
         if (trip.decimals !== undefined) state.decimals = trip.decimals;
         
-        // Restore coordinates if available
         currentTrip = {
             lat: trip.lat || null,
             lon: trip.lon || null,
             name: trip.description,
             rating: trip.rating || null,
-            reviews: trip.reviews || null
+            reviews: trip.reviews || null,
+            image: trip.image || null
         };
         
         calculateTotal();
