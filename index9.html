@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Essential PWA Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MotorTrip Calc">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="MotorTrip Calc">
+    <meta name="description" content="Motorbike Camping Cost Estimator - Plan and calculate your motorcycle trip expenses">
+    
+    <title>MotorTrip Calc - Motorbike Camping Cost Estimator</title>
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/mtp/manifest.json">
+
+    <!-- Icons -->
+    <link rel="icon" href="/mtp/icons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/mtp/icons/apple-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/mtp/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/mtp/icons/icon-512.png">
+    
+    <!-- Font Awesome (local fallback in service worker) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* CSS Variables - Blue Theme */
+        :root {
+            /* Color scheme - Dark mode */
+            --primary-bg: #0a0a0a;
+            --secondary-bg: #1a1a1a;
+            --tertiary-bg: #2a2a2a;
+            --primary-text: #ffffff;
+            --secondary-text: #a0a0a0;
+            --accent-color: #3b82f6;
+            --border-color: rgba(255, 255, 255, 0.1);
+            
+            /* Light mode overrides */
+            --primary-bg-light: #ffffff;
+            --secondary-bg-light: #f8f9fa;
+            --tertiary-bg-light: #e9ecef;
+            --primary-text-light: #1a1a1a;
+            --secondary-text-light: #6c757d;
+            --border-color-light: rgba(0, 0, 0, 0.1);
+            
+            /* Theme color variations - Blue Theme */
+            --theme-1: #3b82f6;
+            --theme-2: #2563eb;
+            --theme-3: #1d4ed8;
+            --theme-4: #dbeafe;
+            
+            /* Glowing border colors - Blue Theme */
+            --glow-color-1: #3b82f6;
+            --glow-color-2: #2563eb;
+            --glow-color-3: #60a5fa;
+            --glow-color-4: #93c5fd;
+            
+            /* Design tokens */
+            --border-radius-card: 16px;
+            --border-radius-button: 12px;
+            --border-radius-input: 12px;
+            --transition-base: all 0.3s ease;
+            --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --font-size-base: 16px;
+            --line-height-base: 1.6;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Z-index layers */
+            --z-background: 0;
+            --z-content: 10;
+            --z-overlay: 100;
+            --z-modal: 1000;
+            --z-toast: 10000;
+        }
+
+        .light-mode {
+            --primary-bg: var(--primary-bg-light);
+            --secondary-bg: var(--secondary-bg-light);
+            --tertiary-bg: var(--tertiary-bg-light);
+            --primary-text: var(--primary-text-light);
+            --secondary-text: var(--secondary-text-light);
+            --border-color: var(--border-color-light);
+        }
+
+        /* Animated motorcycle icon */
+        @keyframes motorcycle-move {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(5px) rotate(5deg); }
+            75% { transform: translateX(-5px) rotate(-5deg); }
+        }
+
+        /* Pulse animation for map icon */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-base);
+            padding: var(--spacing-md);
+            transition: var(--transition-base);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: var(--z-content);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .motorcycle-icon {
+            font-size: 2.5rem;
+            animation: motorcycle-move 3s ease-in-out infinite;
+            color: var(--accent-color);
+        }
+
+        .app-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--theme-1), var(--theme-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            cursor: text;
+            outline: none;
+            border-bottom: 2px dashed transparent;
+            transition: border-color 0.2s;
+        }
+        .app-name:focus {
+            border-bottom-color: var(--accent-color);
+        }
+
+        .theme-toggle {
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-button);
+            color: var(--primary-text);
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: var(--transition-base);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--secondary-bg);
+        }
+
+        /* Animated Glowing Border System */
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        .card-glow-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: var(--border-radius-card);
+            margin: 0 0 20px 0;
+        }
+
+        .card-glow-wrapper::before,
+        .card-glow-wrapper::after {
+            content: '';
+            position: absolute;
+            pointer-events: none;
+            border-radius: calc(var(--border-radius-card) + 4px);
+            z-index: var(--z-background);
+            animation: rotate 4s linear infinite;
+        }
+
+        .card-glow-wrapper::before {
+            inset: -4px;
+            background: conic-gradient(
+                from var(--angle),
+                var(--glow-color-1),
+                var(--glow-color-2),
+                var(--glow-color-3),
+                var(--glow-color-4),
+                var(--glow-color-1)
+            );
+            opacity: 0.7;
+            filter: blur(20px);
+        }
+
+        .card-glow-wrapper::after {
+            inset: -2px;
+            background: conic-gradient(
+                from var(--angle),
+                var(--glow-color-1),
+                var(--glow-color-2),
+                var(--glow-color-3),
+                var(--glow-color-4),
+                var(--glow-color-1)
+            );
+            z-index: calc(var(--z-background) + 1);
+        }
+
+        @keyframes rotate {
+            to {
+                --angle: 360deg;
+            }
+        }
+
+        @supports not (background: conic-gradient(from var(--angle), red, blue)) {
+            .card-glow-wrapper::before,
+            .card-glow-wrapper::after {
+                animation: rotate-fallback 4s linear infinite;
+            }
+            
+            @keyframes rotate-fallback {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        }
+
+        .card-glow {
+            position: relative;
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            padding: var(--spacing-lg);
+            z-index: calc(var(--z-background) + 2);
+            overflow: hidden;
+        }
+
+        /* Total Display - with map icon */
+        .total-display {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+        }
+
+        .total-label {
+            font-size: 1.1rem;
+            color: var(--secondary-text);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .map-icon {
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 1.8rem; /* bigger */
+            transition: transform 0.2s;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        .map-icon:hover {
+            transform: scale(1.3);
+            animation: none;
+        }
+
+        .total-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--theme-1), var(--theme-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.1;
+        }
+
+        .total-details {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+        }
+
+        /* Trip Description */
+        .trip-description-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .trip-description-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-input);
+            color: var(--primary-text);
+            font-size: 18px;
+            font-weight: 600;
+            transition: var(--transition-base);
+            text-align: center;
+        }
+
+        .trip-description-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Trip Date */
+        .trip-date-group {
+            margin-top: var(--spacing-md);
+        }
+
+        .date-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .date-input {
+            flex: 1;
+            padding: 14px 16px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-input);
+            color: var(--primary-text);
+            font-size: 16px;
+        }
+
+        /* Predefined Trips Selector + Import button */
+        .predefined-trips-group {
+            margin: var(--spacing-lg) 0;
+            padding: var(--spacing-md) 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .predefined-trips-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            color: var(--secondary-text);
+            font-weight: 500;
+        }
+
+        .trip-select-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .trip-select-row select {
+            flex: 2;
+            min-width: 200px;
+            padding: 14px 16px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-input);
+            color: var(--primary-text);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .trip-select-row button {
+            width: auto;
+            padding: 14px 20px;
+            white-space: nowrap;
+        }
+
+        .import-btn {
+            background: var(--tertiary-bg);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+        .import-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Input Form */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-header h3 {
+            font-size: 1.2rem;
+            color: var(--primary-text);
+        }
+
+        .form-header i {
+            color: var(--accent-color);
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        @media (min-width: 768px) {
+            .input-row {
+                flex-direction: row;
+            }
+            
+            .input-row .form-group {
+                flex: 1;
+            }
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+
+        .info-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-text);
+            cursor: help;
+            font-size: 14px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--tertiary-bg);
+            transition: var(--transition-base);
+        }
+
+        .info-icon:hover {
+            color: var(--accent-color);
+            background: var(--secondary-bg);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: var(--tertiary-bg);
+            color: var(--primary-text);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-button);
+            font-size: 0.85rem;
+            width: 220px;
+            z-index: var(--z-modal);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-base);
+            right: 0;
+            top: calc(100% + 8px);
+        }
+
+        .info-icon:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 40px 14px 42px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-input);
+            color: var(--primary-text);
+            font-size: 16px;
+            transition: var(--transition-base);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            color: var(--secondary-text);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+
+        @media (min-width: 768px) {
+            .button-group {
+                flex-direction: row;
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 20px;
+            border-radius: var(--border-radius-button);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition-base);
+            border: none;
+            outline: none;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .btn {
+                width: auto;
+                padding: 14px 24px;
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--theme-1), var(--theme-2));
+            color: white;
+        }
+
+        .btn-primary:hover, .btn-primary:active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--tertiary-bg);
+            color: var(--primary-text);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover, .btn-secondary:active {
+            background: var(--secondary-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-modal);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-base);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            padding: var(--spacing-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(20px);
+            transition: var(--transition-base);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 1.4rem;
+            color: var(--primary-text);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .close-modal:hover {
+            color: var(--primary-text);
+        }
+
+        .settings-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .settings-group h3 {
+            font-size: 1.1rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-text);
+        }
+
+        .settings-input-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .settings-input-wrapper {
+            position: relative;
+        }
+
+        .settings-input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+
+        .settings-control {
+            width: 100%;
+            padding: 14px 14px 14px 42px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-input);
+            color: var(--primary-text);
+            font-size: 16px;
+        }
+
+        .currency-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .currency-option {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .currency-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-button);
+            color: var(--primary-text);
+            cursor: pointer;
+            transition: var(--transition-base);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .currency-btn:hover {
+            background: var(--secondary-bg);
+        }
+
+        .currency-btn.active {
+            background: linear-gradient(135deg, var(--theme-1), var(--theme-2));
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .decimal-options {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+
+        .decimal-btn {
+            padding: 10px 16px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-button);
+            color: var(--primary-text);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .decimal-btn:hover {
+            background: var(--secondary-bg);
+        }
+
+        .decimal-btn.active {
+            background: linear-gradient(135deg, var(--theme-1), var(--theme-2));
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        /* Map Modal (new style) */
+        .map-modal-content {
+            max-width: 500px;
+        }
+        .coords-display {
+            background: var(--tertiary-bg);
+            padding: 12px;
+            border-radius: var(--border-radius-input);
+            text-align: center;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        .rating-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 10px;
+            background: var(--tertiary-bg);
+            border-radius: var(--border-radius-button);
+        }
+        .rating-stars {
+            color: #ffc107;
+            letter-spacing: 2px;
+        }
+        .review-count {
+            color: var(--secondary-text);
+        }
+        .google-maps-btn {
+            background: #4285F4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            border-radius: var(--border-radius-button);
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .google-maps-btn:hover {
+            background: #3367D6;
+        }
+
+        /* Import Modal */
+        .import-textarea {
+            width: 100%;
+            min-height: 200px;
+            background: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-input);
+            color: var(--primary-text);
+            padding: 12px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            resize: vertical;
+        }
+        .import-prompt {
+            background: var(--tertiary-bg);
+            padding: 12px;
+            border-radius: var(--border-radius-input);
+            font-size: 0.9rem;
+            border-left: 3px solid var(--accent-color);
+            margin-bottom: 15px;
+        }
+        .import-prompt code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        /* Copy Modal */
+        .copy-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-modal);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-base);
+        }
+
+        .copy-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .copy-modal-content {
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            padding: var(--spacing-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(20px);
+            transition: var(--transition-base);
+        }
+
+        .copy-modal.active .copy-modal-content {
+            transform: translateY(0);
+        }
+
+        .copy-text {
+            background: var(--tertiary-bg);
+            border-radius: var(--border-radius-input);
+            padding: var(--spacing-md);
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: var(--spacing-md) 0;
+            border: 1px solid var(--border-color);
+        }
+
+        /* History Section */
+        .history-section {
+            margin-top: var(--spacing-xl);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .history-header h2 {
+            font-size: 1.3rem;
+            color: var(--primary-text);
+        }
+
+        .clear-history {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition-base);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .clear-history:hover {
+            color: #ef4444;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .history-item {
+            background: var(--secondary-bg);
+            border-radius: var(--border-radius-card);
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-base);
+        }
+
+        .history-item:hover {
+            background: var(--tertiary-bg);
+        }
+
+        .history-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+
+        .history-total {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            white-space: nowrap;
+        }
+
+        .history-date {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin: 4px 0;
+        }
+
+        .history-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--spacing-sm);
+            font-size: 0.9rem;
+            margin-top: var(--spacing-sm);
+            padding-top: var(--spacing-sm);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .history-detail {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-detail span:first-child {
+            color: var(--secondary-text);
+        }
+
+        .history-detail span:last-child {
+            font-weight: 600;
+            color: var(--primary-text);
+        }
+
+        .history-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .history-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary-bg);
+            color: var(--primary-text);
+            padding: 16px 20px;
+            border-radius: var(--border-radius-button);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--accent-color);
+            z-index: var(--z-toast);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition-base);
+            max-width: 300px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .card-glow-wrapper::before,
+            .card-glow-wrapper::after,
+            .motorcycle-icon,
+            .map-icon {
+                animation: none !important;
+            }
+            
+            .btn:hover, .btn:active,
+            .info-icon:hover,
+            .history-item:hover,
+            .map-icon:hover {
+                transform: none !important;
+            }
+            
+            .modal,
+            .copy-modal-content {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Theme Toggle -->
+        <div class="header">
+            <div class="app-title">
+                <i class="fas fa-motorcycle motorcycle-icon"></i>
+                <div class="app-name" id="appName" contenteditable="true">Francine</div>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </div>
+
+        <!-- Main Calculator Card with Glowing Border -->
+        <div class="card-glow-wrapper">
+            <div class="card-glow">
+                <!-- Total Display with map icon -->
+                <div class="total-display">
+                    <div class="total-label">
+                        Total Trip Cost
+                        <i class="fas fa-map-marked-alt map-icon" id="mapIcon" title="Show on map"></i>
+                    </div>
+                    <div class="total-amount" id="totalAmount">₱ 0</div>
+                    <div class="total-details">
+                        <span id="perPerson">Per Person: ₱ 0</span>
+                        <span id="perPair">Per Pair: ₱ 0</span>
+                    </div>
+                </div>
+
+                <!-- Trip Description -->
+                <div class="trip-description-group">
+                    <input type="text" id="tripDescription" class="trip-description-input" placeholder="Trip Description (e.g., Tanay Camping Trip)" value="Tanay Camping Trip">
+                </div>
+
+                <!-- Trip Date -->
+                <div class="trip-date-group">
+                    <label for="tripDate">Trip Date</label>
+                    <div class="date-input-wrapper">
+                        <i class="fas fa-calendar-alt" style="color: var(--accent-color);"></i>
+                        <input type="date" id="tripDate" class="date-input">
+                    </div>
+                </div>
+
+                <!-- Predefined Trips Selector + Import button -->
+                <div class="predefined-trips-group">
+                    <label for="tripSelect">Load a sample camping trip:</label>
+                    <div class="trip-select-row">
+                        <select id="tripSelect" class="form-control">
+                            <option value="">-- Select an example --</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary" id="loadTripBtn">
+                            <i class="fas fa-download"></i> Load
+                        </button>
+                        <button type="button" class="btn btn-secondary import-btn" id="importBtn">
+                            <i class="fas fa-file-import"></i> Import
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Form -->
+                <form id="tripForm">
+                    <!-- Trip Details -->
+                    <div class="form-group">
+                        <div class="form-header">
+                            <i class="fas fa-route"></i>
+                            <h3>Trip Details</h3>
+                        </div>
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label for="distance">Distance (km)</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-road"></i>
+                                    <input type="number" id="distance" class="form-control" value="120" min="0" step="1">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Round trip distance in kilometers</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="fuelPrice">Fuel Price per Liter</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-gas-pump"></i>
+                                    <input type="number" id="fuelPrice" class="form-control" value="56.10" min="0" step="0.01">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Cost of fuel per liter (in your currency)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camping Costs -->
+                    <div class="form-group">
+                        <div class="form-header">
+                            <i class="fas fa-campground"></i>
+                            <h3>Camping Costs</h3>
+                        </div>
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label for="campsiteFee">Campsite Fee (per person)</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-tent"></i>
+                                    <input type="number" id="campsiteFee" class="form-control" value="400" min="0" step="10">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Per person campsite entrance fee</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tentRental">Tent Rental (your share)</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-home"></i>
+                                    <input type="number" id="tentRental" class="form-control" value="250" min="0" step="10">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Your share of tent rental (for 2 people)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-row" style="margin-top: var(--spacing-md);">
+                            <div class="form-group">
+                                <label for="parkingFee">Parking Fee (your share)</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-parking"></i>
+                                    <input type="number" id="parkingFee" class="form-control" value="150" min="0" step="10">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Your share of overnight parking fee (₱300 total for 2 riders)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="environmentalFee">Environmental Fee</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-tree"></i>
+                                    <input type="number" id="environmentalFee" class="form-control" value="30" min="0" step="10">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Eco-tourism/environmental fee per person</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Food & Miscellaneous -->
+                    <div class="form-group">
+                        <div class="form-header">
+                            <i class="fas fa-utensils"></i>
+                            <h3>Food & Miscellaneous</h3>
+                        </div>
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label for="foodCost">Food & Coffee</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-coffee"></i>
+                                    <input type="number" id="foodCost" class="form-control" value="850" min="0" step="10">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Food and drinks for the trip per person</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="miscCost">Other Miscellaneous</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <input type="number" id="miscCost" class="form-control" value="100" min="0" step="10">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                        <div class="tooltip">Other expenses, tips, emergency funds per person</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" id="settingsBtn">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </button>
+                        <button type="button" class="btn btn-primary" id="saveBtn">
+                            <i class="fas fa-save"></i>
+                            Save This Trip
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section">
+            <div class="history-header">
+                <h2><i class="fas fa-history"></i> Trip History</h2>
+                <button class="clear-history" id="clearHistoryBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    Clear All
+                </button>
+            </div>
+            <div class="history-list" id="historyList">
+                <!-- History items will be added here dynamically -->
+                <div class="history-item empty-history">
+                    <div class="history-date">No trips saved yet</div>
+                    <div class="history-details">
+                        <div class="history-detail">
+                            <span>Save a trip to see it here</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>MotorTrip Calc • Designed for motorbike camping trips • All calculations are estimates</p>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+            </div>
+            
+            <div class="settings-group">
+                <h3>Fuel Efficiency</h3>
+                <div class="settings-input-group">
+                    <div class="settings-input-wrapper">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <input type="number" id="fuelEfficiency" class="settings-control" value="40" min="1" step="0.1" placeholder="Fuel efficiency (km/L)">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-group">
+                <h3>Currency</h3>
+                <div class="currency-options">
+                    <div class="currency-option">
+                        <button type="button" class="currency-btn" data-currency="₱">₱ PHP</button>
+                    </div>
+                    <div class="currency-option">
+                        <button type="button" class="currency-btn" data-currency="$">$ USD</button>
+                    </div>
+                    <div class="currency-option">
+                        <button type="button" class="currency-btn" data-currency="£">£ GBP</button>
+                    </div>
+                    <div class="currency-option">
+                        <button type="button" class="currency-btn" data-currency="฿">฿ THB</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-group">
+                <h3>Decimal Places</h3>
+                <div class="decimal-options">
+                    <button type="button" class="decimal-btn" data-decimals="0">0 (₱ 1,234)</button>
+                    <button type="button" class="decimal-btn" data-decimals="2">2 (₱ 1,234.56)</button>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" id="closeModalBtn2">Close</button>
+                <button type="button" class="btn btn-primary" id="applySettingsBtn">Apply Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Modal (now with Google Maps link) -->
+    <div class="modal-overlay" id="mapModal">
+        <div class="modal map-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-map-marked-alt"></i> <span id="mapLocationName">Location</span></h2>
+                <button class="close-modal" id="closeMapModalBtn">&times;</button>
+            </div>
+            <div class="coords-display" id="mapCoords"></div>
+            <div class="rating-info" id="ratingInfo" style="display: none;">
+                <span class="rating-stars" id="ratingStars"></span>
+                <span class="review-count" id="reviewCount"></span>
+            </div>
+            <a href="#" target="_blank" id="googleMapsLink" class="google-maps-btn">
+                <i class="fab fa-google"></i> Open in Google Maps
+            </a>
+            <div class="button-group" style="margin-top: 15px;">
+                <button type="button" class="btn btn-secondary" id="closeMapModalBtn2">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-import"></i> Import Trips</h2>
+                <button class="close-modal" id="closeImportModalBtn">&times;</button>
+            </div>
+            <div class="import-prompt">
+                <p>Paste JSON array from LLM using this format:</p>
+                <code>
+                [
+                  {
+                    "name": "Campsite Name",
+                    "campsiteFee": 500,
+                    "foodCost": 150,
+                    "environmentalFee": 0,
+                    "lat": 14.6548,
+                    "lon": 121.3411,
+                    "rating": 4.5,
+                    "reviews": 120
+                  }
+                ]
+                </code>
+                <p style="margin-top:8px;">Only <strong>name</strong>, <strong>campsiteFee</strong>, and <strong>foodCost</strong> are required. Others optional.</p>
+            </div>
+            <textarea id="importData" class="import-textarea" placeholder='Paste JSON here...'></textarea>
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" id="closeImportModalBtn2">Cancel</button>
+                <button type="button" class="btn btn-primary" id="processImportBtn">Import Trips</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Modal -->
+    <div class="copy-modal" id="copyModal">
+        <div class="copy-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-copy"></i> Copy Trip Details</h2>
+                <button class="close-modal" id="closeCopyModalBtn">&times;</button>
+            </div>
+            <p style="margin-bottom: var(--spacing-md); color: var(--secondary-text);">Copy the text below to share via messaging app:</p>
+            <div class="copy-text" id="copyText"></div>
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" id="closeCopyModalBtn2">Close</button>
+                <button type="button" class="btn btn-primary" id="copyToClipboardBtn">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Trip saved successfully!</span>
+    </div>
+
+    <!-- PWA Installation Prompt (optional) -->
+    <div id="installPrompt" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--secondary-bg); color: var(--primary-text); padding: 15px; border-radius: var(--border-radius-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10000; border: 1px solid var(--border-color); backdrop-filter: blur(10px);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-download" style="color: var(--accent-color); font-size: 1.2rem;"></i>
+                <div>
+                    <div style="font-weight: 600;">Install MotorTrip Calc</div>
+                    <div style="font-size: 0.9rem; color: var(--secondary-text);">Add to home screen for full offline experience</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="installCancel" style="padding: 8px 16px; background: var(--tertiary-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-button); color: var(--primary-text); cursor: pointer;">Later</button>
+                <button id="installAccept" style="padding: 8px 16px; background: linear-gradient(135deg, var(--theme-1), var(--theme-2)); border: none; border-radius: var(--border-radius-button); color: white; cursor: pointer; font-weight: 600;">Install</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // PWA Installation Prompt
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+    const installCancel = document.getElementById('installCancel');
+    const installAccept = document.getElementById('installAccept');
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    if (!isStandalone) {
+        const lastDismissed = localStorage.getItem('installPromptDismissed');
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        const showPrompt = !lastDismissed || (Date.now() - parseInt(lastDismissed) > oneWeek);
+        if (showPrompt) {
+            setTimeout(() => { installPrompt.style.display = 'block'; }, 5000);
+        }
+    }
+
+    installCancel.addEventListener('click', () => {
+        installPrompt.style.display = 'none';
+        localStorage.setItem('installPromptDismissed', Date.now());
+    });
+
+    installAccept.addEventListener('click', () => {
+        installPrompt.style.display = 'none';
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+        }
+        localStorage.setItem('installPromptAccepted', Date.now());
+    });
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const lastDismissed = localStorage.getItem('installPromptDismissed');
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        if (!lastDismissed || (Date.now() - parseInt(lastDismissed) > oneWeek)) {
+            installPrompt.style.display = 'block';
+        }
+    });
+
+    // ---------- APP STATE ----------
+    const state = {
+        currency: '₱',
+        decimals: 0,
+        fuelEfficiency: 40,
+        history: [],
+        importedTrips: []   // will be merged with default trips
+    };
+
+    // Current trip coordinates (if known)
+    let currentTrip = {
+        lat: null,
+        lon: null,
+        name: 'Tanay, Rizal',
+        rating: null,
+        reviews: null
+    };
+
+    // ---------- DEFAULT SAMPLE TRIPS (built-in) ----------
+    const defaultTrips = [
+        { 
+            name: "River Ranch PH (Tanay)", 
+            campsiteFee: 800, 
+            foodCost: 150, 
+            environmentalFee: 0,
+            lat: 14.6548,
+            lon: 121.3411,
+            rating: 4.7,
+            reviews: 74
+        },
+        { 
+            name: "Bulod Campsite (Daraitan, Tanay)", 
+            campsiteFee: 300, 
+            foodCost: 150, 
+            environmentalFee: 0,
+            lat: 14.6111,
+            lon: 121.4172,
+            rating: null,
+            reviews: null
+        },
+        { 
+            name: "Camp Irog Daraitan (Tanay)", 
+            campsiteFee: 400, 
+            foodCost: 150, 
+            environmentalFee: 0,
+            lat: 14.6067,
+            lon: 121.4285,
+            rating: 5.0,
+            reviews: 23
+        },
+        { 
+            name: "Daranak/Batlag Falls area (Tanay)", 
+            campsiteFee: 400, 
+            foodCost: 150, 
+            environmentalFee: 50,
+            lat: 14.5450,
+            lon: 121.2950,
+            rating: 4.4,
+            reviews: 1300
+        },
+        { 
+            name: "Atburan Camping Ground (Tanay)", 
+            campsiteFee: 300, 
+            foodCost: 150, 
+            environmentalFee: 0,
+            lat: 14.6425,
+            lon: 121.4350,
+            rating: null,
+            reviews: null
+        },
+        { 
+            name: "Luklukan Camp and Chill (Tanay)", 
+            campsiteFee: 400, 
+            foodCost: 150, 
+            environmentalFee: 0,
+            lat: 14.5886,
+            lon: 121.3325,
+            rating: 4.9,
+            reviews: 18
+        },
+        { 
+            name: "Blessed HM Campsite (Tanay)", 
+            campsiteFee: 500, 
+            foodCost: 150, 
+            environmentalFee: 0,
+            lat: 14.6083,
+            lon: 121.3283,
+            rating: 5.0,
+            reviews: 1
+        },
+        { 
+            name: "Camp Majai Riverfront (Tanay)", 
+            campsiteFee: 400, 
+            foodCost: 150, 
+            environmentalFee: 0,
+            lat: 14.6317,
+            lon: 121.3450,
+            rating: 4.9,
+            reviews: 10
+        }
+    ];
+
+    // Combined trips (default + imported)
+    let allTrips = [...defaultTrips];
+
+    // DOM Elements
+    const themeToggle = document.getElementById('themeToggle');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const mapModal = document.getElementById('mapModal');
+    const copyModal = document.getElementById('copyModal');
+    const importModal = document.getElementById('importModal');
+    const closeModalBtns = document.querySelectorAll('#closeModalBtn, #closeModalBtn2');
+    const closeMapModalBtns = document.querySelectorAll('#closeMapModalBtn, #closeMapModalBtn2');
+    const closeCopyModalBtns = document.querySelectorAll('#closeCopyModalBtn, #closeCopyModalBtn2');
+    const closeImportModalBtns = document.querySelectorAll('#closeImportModalBtn, #closeImportModalBtn2');
+    const applySettingsBtn = document.getElementById('applySettingsBtn');
+    const copyToClipboardBtn = document.getElementById('copyToClipboardBtn');
+    const processImportBtn = document.getElementById('processImportBtn');
+    const currencyBtns = document.querySelectorAll('.currency-btn');
+    const decimalBtns = document.querySelectorAll('.decimal-btn');
+    const totalAmount = document.getElementById('totalAmount');
+    const perPerson = document.getElementById('perPerson');
+    const perPair = document.getElementById('perPair');
+    const historyList = document.getElementById('historyList');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    const copyText = document.getElementById('copyText');
+    
+    const tripDescriptionInput = document.getElementById('tripDescription');
+    const tripDateInput = document.getElementById('tripDate');
+    const distanceInput = document.getElementById('distance');
+    const fuelPriceInput = document.getElementById('fuelPrice');
+    const campsiteFeeInput = document.getElementById('campsiteFee');
+    const tentRentalInput = document.getElementById('tentRental');
+    const parkingFeeInput = document.getElementById('parkingFee');
+    const environmentalFeeInput = document.getElementById('environmentalFee');
+    const foodCostInput = document.getElementById('foodCost');
+    const miscCostInput = document.getElementById('miscCost');
+    const fuelEfficiencyInput = document.getElementById('fuelEfficiency');
+    const appNameDiv = document.getElementById('appName');
+
+    const tripSelect = document.getElementById('tripSelect');
+    const loadTripBtn = document.getElementById('loadTripBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importData = document.getElementById('importData');
+
+    // Map elements
+    const mapIcon = document.getElementById('mapIcon');
+    const mapLocationName = document.getElementById('mapLocationName');
+    const mapCoords = document.getElementById('mapCoords');
+    const ratingInfo = document.getElementById('ratingInfo');
+    const ratingStars = document.getElementById('ratingStars');
+    const reviewCount = document.getElementById('reviewCount');
+    const googleMapsLink = document.getElementById('googleMapsLink');
+
+    // Initialize the app
+    function init() {
+        // Load saved app name
+        const savedAppName = localStorage.getItem('appName');
+        if (savedAppName) appNameDiv.textContent = savedAppName;
+        appNameDiv.addEventListener('input', () => {
+            localStorage.setItem('appName', appNameDiv.textContent);
+        });
+
+        // Load imported trips from localStorage
+        loadImportedTrips();
+
+        // Populate dropdown with all trips
+        populateTripSelect();
+
+        const today = new Date();
+        tripDateInput.value = today.toISOString().split('T')[0];
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            updateThemeToggle();
+        }
+        
+        loadSettings();
+        loadHistory();
+        calculateTotal();
+        setupEventListeners();
+    }
+
+    function loadImportedTrips() {
+        const saved = localStorage.getItem('importedTrips');
+        if (saved) {
+            try {
+                state.importedTrips = JSON.parse(saved);
+                // Merge with defaults, avoid duplicates by name? Simple: just concatenate.
+                allTrips = [...defaultTrips, ...state.importedTrips];
+            } catch (e) {
+                console.warn('Failed to load imported trips', e);
+            }
+        } else {
+            allTrips = [...defaultTrips];
+        }
+    }
+
+    function saveImportedTrips() {
+        localStorage.setItem('importedTrips', JSON.stringify(state.importedTrips));
+        // Refresh the combined list
+        allTrips = [...defaultTrips, ...state.importedTrips];
+        populateTripSelect();
+    }
+
+    function populateTripSelect() {
+        // Clear existing options except the first placeholder
+        while (tripSelect.options.length > 1) {
+            tripSelect.remove(1);
+        }
+        allTrips.forEach(trip => {
+            const option = document.createElement('option');
+            option.value = trip.name;
+            option.textContent = trip.name;
+            tripSelect.appendChild(option);
+        });
+    }
+
+    function loadSampleTrip() {
+        const selectedName = tripSelect.value;
+        if (!selectedName) {
+            showToast('Please select a trip');
+            return;
+        }
+        const trip = allTrips.find(t => t.name === selectedName);
+        if (!trip) return;
+
+        tripDescriptionInput.value = trip.name;
+        campsiteFeeInput.value = trip.campsiteFee;
+        foodCostInput.value = trip.foodCost;
+        environmentalFeeInput.value = trip.environmentalFee;
+        tentRentalInput.value = 0;
+        parkingFeeInput.value = 0;
+        miscCostInput.value = 0;
+        
+        // Update current trip coordinates
+        currentTrip = {
+            lat: trip.lat || null,
+            lon: trip.lon || null,
+            name: trip.name,
+            rating: trip.rating || null,
+            reviews: trip.reviews || null
+        };
+        
+        calculateTotal();
+        showToast(`Loaded "${trip.name}"`);
+    }
+
+    // Show map modal with Google Maps link
+    function showMap() {
+        let lat = currentTrip.lat;
+        let lon = currentTrip.lon;
+        let name = currentTrip.name;
+
+        // If no coordinates, default to Tanay town center
+        if (!lat || !lon) {
+            lat = 14.5869;
+            lon = 121.2844;
+            name = 'Tanay, Rizal (default)';
+        }
+
+        mapLocationName.textContent = name;
+        mapCoords.textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        googleMapsLink.href = `https://maps.google.com/?daddr=${lat},${lon}`;
+
+        // Show rating if available
+        if (currentTrip.rating) {
+            ratingInfo.style.display = 'flex';
+            const fullStars = Math.floor(currentTrip.rating);
+            const halfStar = currentTrip.rating % 1 >= 0.5 ? '½' : '';
+            ratingStars.innerHTML = '★'.repeat(fullStars) + halfStar;
+            reviewCount.textContent = `(${currentTrip.reviews} reviews)`;
+        } else {
+            ratingInfo.style.display = 'none';
+        }
+
+        toggleModal(mapModal, true);
+    }
+
+    // Import trips from JSON
+    function importTrips() {
+        const raw = importData.value.trim();
+        if (!raw) {
+            showToast('Please paste some JSON data');
+            return;
+        }
+        try {
+            const imported = JSON.parse(raw);
+            if (!Array.isArray(imported)) {
+                showToast('Data must be an array');
+                return;
+            }
+            // Basic validation
+            const validTrips = [];
+            for (const item of imported) {
+                if (!item.name || typeof item.campsiteFee !== 'number' || typeof item.foodCost !== 'number') {
+                    showToast('Each trip must have name (string), campsiteFee (number), foodCost (number)');
+                    return;
+                }
+                // Optional fields
+                validTrips.push({
+                    name: item.name,
+                    campsiteFee: item.campsiteFee,
+                    foodCost: item.foodCost,
+                    environmentalFee: item.environmentalFee || 0,
+                    lat: item.lat || null,
+                    lon: item.lon || null,
+                    rating: item.rating || null,
+                    reviews: item.reviews || null
+                });
+            }
+            // Append to importedTrips (avoid duplicates by name? optional)
+            state.importedTrips = [...state.importedTrips, ...validTrips];
+            saveImportedTrips();
+            toggleModal(importModal, false);
+            showToast(`Imported ${validTrips.length} trip(s)`);
+        } catch (e) {
+            showToast('Invalid JSON: ' + e.message);
+        }
+    }
+
+    function setupEventListeners() {
+        themeToggle.addEventListener('click', toggleTheme);
+        
+        settingsBtn.addEventListener('click', () => toggleModal(settingsModal, true));
+        closeModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(settingsModal, false)));
+        applySettingsBtn.addEventListener('click', applySettings);
+        
+        closeMapModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(mapModal, false)));
+        
+        closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
+        copyToClipboardBtn.addEventListener('click', copyToClipboard);
+        
+        closeImportModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(importModal, false)));
+        processImportBtn.addEventListener('click', importTrips);
+        
+        saveBtn.addEventListener('click', saveTrip);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+        
+        const inputs = document.querySelectorAll('.form-control, .trip-description-input, .date-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateTotal);
+            input.addEventListener('change', calculateTotal);
+        });
+        
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) toggleModal(settingsModal, false);
+        });
+        
+        mapModal.addEventListener('click', (e) => {
+            if (e.target === mapModal) toggleModal(mapModal, false);
+        });
+        
+        copyModal.addEventListener('click', (e) => {
+            if (e.target === copyModal) toggleModal(copyModal, false);
+        });
+        
+        importModal.addEventListener('click', (e) => {
+            if (e.target === importModal) toggleModal(importModal, false);
+        });
+
+        loadTripBtn.addEventListener('click', loadSampleTrip);
+        importBtn.addEventListener('click', () => {
+            importData.value = ''; // clear previous
+            toggleModal(importModal, true);
+        });
+
+        // Map icon click
+        mapIcon.addEventListener('click', showMap);
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        const isLightMode = document.body.classList.contains('light-mode');
+        localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+        updateThemeToggle();
+    }
+
+    function updateThemeToggle() {
+        const isLightMode = document.body.classList.contains('light-mode');
+        const icon = themeToggle.querySelector('i');
+        const text = themeToggle.querySelector('span');
+        icon.className = isLightMode ? 'fas fa-sun' : 'fas fa-moon';
+        text.textContent = isLightMode ? 'Light' : 'Dark';
+    }
+
+    function toggleModal(modal, show) {
+        if (show) {
+            if (modal === settingsModal) {
+                fuelEfficiencyInput.value = state.fuelEfficiency;
+                currencyBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.currency === state.currency) btn.classList.add('active');
+                });
+                decimalBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.dataset.decimals) === state.decimals) btn.classList.add('active');
+                });
+            }
+            modal.classList.add('active');
+        } else {
+            modal.classList.remove('active');
+        }
+    }
+
+    function loadSettings() {
+        const savedCurrency = localStorage.getItem('currency');
+        const savedDecimals = localStorage.getItem('decimals');
+        const savedFuelEfficiency = localStorage.getItem('fuelEfficiency');
+        if (savedCurrency) state.currency = savedCurrency;
+        if (savedDecimals !== null) state.decimals = parseInt(savedDecimals);
+        if (savedFuelEfficiency !== null) state.fuelEfficiency = parseFloat(savedFuelEfficiency);
+    }
+
+    function applySettings() {
+        state.fuelEfficiency = parseFloat(fuelEfficiencyInput.value) || 40;
+        const activeCurrencyBtn = document.querySelector('.currency-btn.active');
+        state.currency = activeCurrencyBtn.dataset.currency;
+        const activeDecimalBtn = document.querySelector('.decimal-btn.active');
+        state.decimals = parseInt(activeDecimalBtn.dataset.decimals);
+        
+        localStorage.setItem('currency', state.currency);
+        localStorage.setItem('decimals', state.decimals);
+        localStorage.setItem('fuelEfficiency', state.fuelEfficiency);
+        
+        calculateTotal();
+        toggleModal(settingsModal, false);
+        showToast('Settings applied successfully');
+    }
+
+    function calculateTotal() {
+        const distance = parseFloat(distanceInput.value) || 0;
+        const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
+        const campsiteFee = parseFloat(campsiteFeeInput.value) || 0;
+        const tentRental = parseFloat(tentRentalInput.value) || 0;
+        const parkingFee = parseFloat(parkingFeeInput.value) || 0;
+        const environmentalFee = parseFloat(environmentalFeeInput.value) || 0;
+        const foodCost = parseFloat(foodCostInput.value) || 0;
+        const miscCost = parseFloat(miscCostInput.value) || 0;
+        
+        const fuelCostPerPerson = ((distance / state.fuelEfficiency) * fuelPrice) / 2;
+        const totalPerPerson = fuelCostPerPerson + campsiteFee + tentRental + parkingFee + environmentalFee + foodCost + miscCost;
+        const totalPerPair = totalPerPerson * 2;
+        
+        const formatOptions = { minimumFractionDigits: state.decimals, maximumFractionDigits: state.decimals };
+        totalAmount.textContent = `${state.currency} ${totalPerPerson.toLocaleString(undefined, formatOptions)}`;
+        perPerson.textContent = `Per Person: ${state.currency} ${totalPerPerson.toLocaleString(undefined, formatOptions)}`;
+        perPair.textContent = `Per Pair: ${state.currency} ${totalPerPair.toLocaleString(undefined, formatOptions)}`;
+        
+        return {
+            description: tripDescriptionInput.value || 'Unnamed Trip',
+            date: tripDateInput.value,
+            perPerson: totalPerPerson,
+            perPair: totalPerPair,
+            fuelCost: fuelCostPerPerson,
+            fuelPrice: fuelPrice,
+            distance: distance,
+            fuelEfficiency: state.fuelEfficiency,
+            campsiteFee,
+            tentRental,
+            parkingFee,
+            environmentalFee,
+            foodCost,
+            miscCost,
+            totalMisc: miscCost
+        };
+    }
+
+    function formatDisplayDate(dateString) {
+        if (!dateString) return 'No date';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function generateShareText(trip) {
+        const formatOptions = { minimumFractionDigits: state.decimals, maximumFractionDigits: state.decimals };
+        const dateStr = formatDisplayDate(trip.date);
+        return `🏍️ ${trip.description} - ${dateStr}
+
+💰 TOTAL: ${state.currency} ${trip.perPerson.toLocaleString(undefined, formatOptions)} per person
+       ${state.currency} ${trip.perPair.toLocaleString(undefined, formatOptions)} per pair
+
+📊 BREAKDOWN:
+• Distance: ${trip.distance} km
+• Fuel Efficiency: ${trip.fuelEfficiency} km/L
+• Fuel Price: ${state.currency} ${trip.fuelPrice.toLocaleString(undefined, formatOptions)}/L
+• Fuel Cost: ${state.currency} ${trip.fuelCost.toLocaleString(undefined, formatOptions)}
+• Campsite Fee: ${state.currency} ${trip.campsiteFee.toLocaleString(undefined, formatOptions)}
+• Tent Rental: ${state.currency} ${trip.tentRental.toLocaleString(undefined, formatOptions)}
+• Parking Fee: ${state.currency} ${trip.parkingFee.toLocaleString(undefined, formatOptions)}
+• Environmental Fee: ${state.currency} ${trip.environmentalFee.toLocaleString(undefined, formatOptions)}
+• Food & Coffee: ${state.currency} ${trip.foodCost.toLocaleString(undefined, formatOptions)}
+• Miscellaneous: ${state.currency} ${trip.totalMisc.toLocaleString(undefined, formatOptions)}
+
+📅 Trip Date: ${dateStr}
+⚙️ Calculated with MotorTrip Calc`;
+    }
+
+    function showCopyModal(trip) {
+        copyText.textContent = generateShareText(trip);
+        toggleModal(copyModal, true);
+    }
+
+    function copyToClipboard() {
+        navigator.clipboard.writeText(copyText.textContent).then(() => {
+            showToast('Copied to clipboard!');
+            toggleModal(copyModal, false);
+        }).catch(() => showToast('Failed to copy to clipboard'));
+    }
+
+    function saveTrip() {
+        const description = tripDescriptionInput.value.trim();
+        if (!description) {
+            showToast('Please enter a trip description');
+            tripDescriptionInput.focus();
+            return;
+        }
+        const tripData = calculateTotal();
+        const historyItem = {
+            id: Date.now(),
+            date: tripData.date,
+            description: description,
+            ...tripData,
+            currency: state.currency,
+            decimals: state.decimals,
+            savedAt: new Date().toISOString(),
+            // Save current coordinates
+            lat: currentTrip.lat,
+            lon: currentTrip.lon,
+            rating: currentTrip.rating,
+            reviews: currentTrip.reviews
+        };
+        state.history.unshift(historyItem);
+        saveHistory();
+        updateHistoryDisplay();
+        showToast(`"${description}" saved to history`);
+    }
+
+    function loadHistory() {
+        const savedHistory = localStorage.getItem('tripHistory');
+        if (savedHistory) {
+            state.history = JSON.parse(savedHistory);
+            updateHistoryDisplay();
+        }
+    }
+
+    function saveHistory() {
+        localStorage.setItem('tripHistory', JSON.stringify(state.history));
+    }
+
+    function updateHistoryDisplay() {
+        historyList.innerHTML = '';
+        if (state.history.length === 0) {
+            historyList.innerHTML = `<div class="history-item empty-history"><div class="history-date">No trips saved yet</div><div class="history-details"><div class="history-detail"><span>Save a trip to see it here</span></div></div></div>`;
+            return;
+        }
+        state.history.forEach(item => {
+            const formatOptions = { minimumFractionDigits: item.decimals || 0, maximumFractionDigits: item.decimals || 0 };
+            const displayDate = formatDisplayDate(item.date);
+            const el = document.createElement('div');
+            el.className = 'history-item';
+            el.innerHTML = `
+                <div class="history-header-row">
+                    <div class="history-title">${item.description}</div>
+                    <div class="history-total">${item.currency || '₱'} ${item.perPerson.toLocaleString(undefined, formatOptions)}</div>
+                    <div class="history-date">${displayDate}</div>
+                </div>
+                <div class="history-details">
+                    <div class="history-detail"><span>Distance:</span><span>${item.distance} km</span></div>
+                    <div class="history-detail"><span>Fuel:</span><span>${item.currency || '₱'} ${item.fuelCost.toLocaleString(undefined, formatOptions)}</span></div>
+                    <div class="history-detail"><span>Camping:</span><span>${item.currency || '₱'} ${(item.campsiteFee + item.tentRental + item.parkingFee + item.environmentalFee).toLocaleString(undefined, formatOptions)}</span></div>
+                    <div class="history-detail"><span>Food:</span><span>${item.currency || '₱'} ${item.foodCost.toLocaleString(undefined, formatOptions)}</span></div>
+                    <div class="history-detail"><span>Other:</span><span>${item.currency || '₱'} ${item.totalMisc.toLocaleString(undefined, formatOptions)}</span></div>
+                    <div class="history-detail"><span>Fuel Eff:</span><span>${item.fuelEfficiency} km/L</span></div>
+                </div>
+                <div class="history-actions">
+                    <button class="btn btn-secondary history-btn load-trip-btn" data-id="${item.id}"><i class="fas fa-undo"></i> Load</button>
+                    <button class="btn btn-secondary history-btn copy-trip-btn" data-id="${item.id}"><i class="fas fa-copy"></i> Copy</button>
+                    <button class="btn btn-secondary history-btn delete-trip-btn" data-id="${item.id}"><i class="fas fa-trash-alt"></i> Delete</button>
+                </div>
+            `;
+            historyList.appendChild(el);
+        });
+        document.querySelectorAll('.load-trip-btn').forEach(btn => btn.addEventListener('click', e => loadTrip(parseInt(e.currentTarget.dataset.id))));
+        document.querySelectorAll('.copy-trip-btn').forEach(btn => btn.addEventListener('click', e => copyTrip(parseInt(e.currentTarget.dataset.id))));
+        document.querySelectorAll('.delete-trip-btn').forEach(btn => btn.addEventListener('click', e => deleteTrip(parseInt(e.currentTarget.dataset.id))));
+    }
+
+    function loadTrip(id) {
+        const trip = state.history.find(item => item.id === id);
+        if (!trip) return;
+        tripDescriptionInput.value = trip.description;
+        tripDateInput.value = trip.date;
+        distanceInput.value = trip.distance;
+        fuelPriceInput.value = trip.fuelPrice;
+        campsiteFeeInput.value = trip.campsiteFee;
+        tentRentalInput.value = trip.tentRental;
+        parkingFeeInput.value = trip.parkingFee;
+        environmentalFeeInput.value = trip.environmentalFee;
+        foodCostInput.value = trip.foodCost;
+        miscCostInput.value = trip.totalMisc;
+        state.fuelEfficiency = trip.fuelEfficiency;
+        if (trip.currency) state.currency = trip.currency;
+        if (trip.decimals !== undefined) state.decimals = trip.decimals;
+        
+        // Restore coordinates if available
+        currentTrip = {
+            lat: trip.lat || null,
+            lon: trip.lon || null,
+            name: trip.description,
+            rating: trip.rating || null,
+            reviews: trip.reviews || null
+        };
+        
+        calculateTotal();
+        showToast(`"${trip.description}" loaded from history`);
+    }
+
+    function copyTrip(id) {
+        const trip = state.history.find(item => item.id === id);
+        if (trip) showCopyModal(trip);
+    }
+
+    function deleteTrip(id) {
+        const trip = state.history.find(item => item.id === id);
+        if (trip && confirm(`Delete "${trip.description}"?`)) {
+            state.history = state.history.filter(item => item.id !== id);
+            saveHistory();
+            updateHistoryDisplay();
+            showToast(`"${trip.description}" deleted`);
+        }
+    }
+
+    function clearHistory() {
+        if (state.history.length && confirm('Clear all trip history?')) {
+            state.history = [];
+            saveHistory();
+            updateHistoryDisplay();
+            showToast('All history cleared');
+        }
+    }
+
+    function showToast(message) {
+        toastMessage.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js').catch(console.log);
+        });
+    }
+    </script>
+</body>
+</html>
