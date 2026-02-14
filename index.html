@@ -93,7 +93,7 @@
             --border-color: var(--border-color-light);
         }
 
-        /* Liquid blob animation - FIXED: keyframe added */
+        /* Liquid blob animation */
         @keyframes blob {
             0%, 100% { 
                 border-radius: 40% 60% 50% 50%; 
@@ -191,6 +191,13 @@
             opacity: 0.1;
             filter: blur(120px);
             animation: blob 15s ease-in-out infinite;
+        }
+
+        /* Disable blob animation on mobile for performance */
+        @media (max-width: 768px) {
+            .blob {
+                animation: none !important;
+            }
         }
 
         .blob-1 {
@@ -315,23 +322,25 @@
             transform: translateY(-2px);
         }
 
-        /* Animated Glowing Border System */
-        @property --angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-        }
-
+        /* Animated Glowing Border System - FIXED */
         .card-glow-wrapper {
-            position: relative;
+            position: relative;  /* Added to contain pseudo-elements */
             width: 100%;
             border-radius: var(--border-radius-card);
             margin: 0 0 20px 0;
         }
 
-        .card-glow-wrapper::before {
+        .card-glow-wrapper::before,
+        .card-glow-wrapper::after {
             content: '';
             position: absolute;
+            pointer-events: none; /* Ensure they don't block clicks */
+            border-radius: calc(var(--border-radius-card) + 4px);
+            z-index: calc(var(--z-background) + 1);
+            animation: rotate 4s linear infinite;
+        }
+
+        .card-glow-wrapper::before {
             inset: -4px;
             background: conic-gradient(
                 from var(--angle),
@@ -341,16 +350,11 @@
                 var(--glow-color-4),
                 var(--glow-color-1)
             );
-            border-radius: calc(var(--border-radius-card) + 4px);
-            z-index: calc(var(--z-background) + 1);
-            animation: rotate 4s linear infinite;
             opacity: 0.7;
             filter: blur(20px);
         }
 
         .card-glow-wrapper::after {
-            content: '';
-            position: absolute;
             inset: -2px;
             background: conic-gradient(
                 from var(--angle),
@@ -360,9 +364,7 @@
                 var(--glow-color-4),
                 var(--glow-color-1)
             );
-            border-radius: calc(var(--border-radius-card) + 2px);
             z-index: calc(var(--z-background) + 2);
-            animation: rotate 4s linear infinite;
         }
 
         @keyframes rotate {
@@ -475,7 +477,7 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Predefined Trips Selector - GENERIC LABEL */
+        /* GENERIC Predefined Trips Selector */
         .predefined-trips-group {
             margin: var(--spacing-lg) 0;
             padding: var(--spacing-md) 0;
