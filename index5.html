@@ -76,6 +76,9 @@
             
             /* Z-index layers */
             --z-background: -10;
+            --z-blobs: -25;
+            --z-noise: -4;
+            --z-overlay: -3;
             --z-content: 10;
             --z-modal: 1000;
             --z-toast: 10000;
@@ -90,6 +93,30 @@
             --border-color: var(--border-color-light);
         }
 
+        /* Liquid blob animation */
+        @keyframes blob {
+            0%, 100% { 
+                border-radius: 40% 60% 50% 50%; 
+                transform: scale(1) rotate(0deg); 
+            }
+            20% { 
+                border-radius: 20% 80% 60% 40%; 
+                transform: scale(1.2) rotate(45deg); 
+            }
+            40% { 
+                border-radius: 80% 20% 40% 60%; 
+                transform: scale(0.8) rotate(-30deg); 
+            }
+            60% { 
+                border-radius: 30% 70% 80% 20%; 
+                transform: scale(1.1) rotate(20deg); 
+            }
+            80% { 
+                border-radius: 70% 30% 30% 70%; 
+                transform: scale(0.9) rotate(-40deg); 
+            }
+        }
+
         /* Animated motorcycle icon */
         @keyframes motorcycle-move {
             0%, 100% { 
@@ -101,6 +128,30 @@
             75% { 
                 transform: translateX(-5px) rotate(-5deg); 
             }
+        }
+
+        /* Noise texture */
+        .noise {
+            position: fixed;
+            inset: 0;
+            z-index: var(--z-noise);
+            opacity: 0.08;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        /* Dark overlay that mutes the blobs */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.99);
+            z-index: var(--z-overlay);
+            pointer-events: none;
+        }
+
+        .light-mode .overlay {
+            background: rgba(255, 255, 255, 0.9);
         }
 
         /* Base Styles */
@@ -124,6 +175,77 @@
             align-items: center;
             position: relative;
             overflow-x: hidden;
+        }
+
+        /* Background Blobs Layer */
+        .blobs-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: var(--z-blobs);
+        }
+
+        .blob {
+            position: absolute;
+            opacity: 0.1;
+            filter: blur(120px);
+            animation: blob 15s ease-in-out infinite;
+        }
+
+        /* Disable blob animation on mobile for performance */
+        @media (max-width: 768px) {
+            .blob {
+                animation: none !important;
+            }
+        }
+
+        .blob-1 {
+            top: -25%;
+            left: -25%;
+            width: 900px;
+            height: 900px;
+            background: linear-gradient(to bottom right, #8b5cf6, #ec4899, #f472b6);
+        }
+
+        .blob-2 {
+            top: -25%;
+            right: -25%;
+            width: 900px;
+            height: 900px;
+            background: linear-gradient(to bottom left, #3b82f6, #06b6d4, #0d9488);
+            animation-direction: reverse;
+            filter: blur(130px);
+        }
+
+        .blob-3 {
+            bottom: -25%;
+            left: -25%;
+            width: 850px;
+            height: 850px;
+            background: linear-gradient(to top right, #f59e0b, #f97316, #ef4444);
+            filter: blur(110px);
+        }
+
+        .blob-4 {
+            bottom: -25%;
+            right: -25%;
+            width: 800px;
+            height: 800px;
+            background: linear-gradient(to top left, #10b981, #22c55e, #84cc16);
+            animation-direction: reverse;
+            filter: blur(100px);
+        }
+
+        .blob-5 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1200px;
+            height: 1200px;
+            background: linear-gradient(to right, #4f46e5, #7c3aed, #c026d3);
+            filter: blur(180px);
+            opacity: 0.25;
         }
 
         .container {
@@ -200,15 +322,9 @@
             transform: translateY(-2px);
         }
 
-        /* Animated Glowing Border System */
-        @property --angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-        }
-
+        /* Animated Glowing Border System - FIXED */
         .card-glow-wrapper {
-            position: relative;
+            position: relative;  /* Added to contain pseudo-elements */
             width: 100%;
             border-radius: var(--border-radius-card);
             margin: 0 0 20px 0;
@@ -218,7 +334,7 @@
         .card-glow-wrapper::after {
             content: '';
             position: absolute;
-            pointer-events: none;
+            pointer-events: none; /* Ensure they don't block clicks */
             border-radius: calc(var(--border-radius-card) + 4px);
             z-index: calc(var(--z-background) + 1);
             animation: rotate 4s linear infinite;
@@ -1001,6 +1117,7 @@
             
             .card-glow-wrapper::before,
             .card-glow-wrapper::after,
+            .blob,
             .motorcycle-icon {
                 animation: none !important;
             }
@@ -1019,6 +1136,18 @@
     </style>
 </head>
 <body>
+    <!-- Background Layers -->
+    <div class="blobs-layer">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+    </div>
+    
+    <div class="overlay"></div>
+    <div class="noise"></div>
+
     <!-- Main Content -->
     <div class="container">
         <!-- Header with Theme Toggle -->
