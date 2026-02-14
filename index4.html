@@ -93,30 +93,6 @@
             --border-color: var(--border-color-light);
         }
 
-        /* Liquid blob animation - FIXED: keyframe added */
-        @keyframes blob {
-            0%, 100% { 
-                border-radius: 40% 60% 50% 50%; 
-                transform: scale(1) rotate(0deg); 
-            }
-            20% { 
-                border-radius: 20% 80% 60% 40%; 
-                transform: scale(1.2) rotate(45deg); 
-            }
-            40% { 
-                border-radius: 80% 20% 40% 60%; 
-                transform: scale(0.8) rotate(-30deg); 
-            }
-            60% { 
-                border-radius: 30% 70% 80% 20%; 
-                transform: scale(1.1) rotate(20deg); 
-            }
-            80% { 
-                border-radius: 70% 30% 30% 70%; 
-                transform: scale(0.9) rotate(-40deg); 
-            }
-        }
-
         /* Animated motorcycle icon */
         @keyframes motorcycle-move {
             0%, 100% { 
@@ -190,7 +166,6 @@
             position: absolute;
             opacity: 0.1;
             filter: blur(120px);
-            animation: blob 15s ease-in-out infinite;
         }
 
         .blob-1 {
@@ -199,6 +174,7 @@
             width: 900px;
             height: 900px;
             background: linear-gradient(to bottom right, #8b5cf6, #ec4899, #f472b6);
+            animation: blob 12s ease-in-out infinite;
         }
 
         .blob-2 {
@@ -207,7 +183,7 @@
             width: 900px;
             height: 900px;
             background: linear-gradient(to bottom left, #3b82f6, #06b6d4, #0d9488);
-            animation-direction: reverse;
+            animation: blob 15s ease-in-out infinite reverse;
             filter: blur(130px);
         }
 
@@ -217,6 +193,7 @@
             width: 850px;
             height: 850px;
             background: linear-gradient(to top right, #f59e0b, #f97316, #ef4444);
+            animation: blob 18s ease-in-out infinite;
             filter: blur(110px);
         }
 
@@ -226,7 +203,7 @@
             width: 800px;
             height: 800px;
             background: linear-gradient(to top left, #10b981, #22c55e, #84cc16);
-            animation-direction: reverse;
+            animation: blob 14s ease-in-out infinite reverse;
             filter: blur(100px);
         }
 
@@ -237,6 +214,7 @@
             width: 1200px;
             height: 1200px;
             background: linear-gradient(to right, #4f46e5, #7c3aed, #c026d3);
+            animation: blob 20s ease-in-out infinite;
             filter: blur(180px);
             opacity: 0.25;
         }
@@ -288,12 +266,6 @@
             color: transparent;
             cursor: text;
             min-width: 200px;
-            outline: none;
-            border-bottom: 2px dashed transparent;
-            transition: border-color 0.2s;
-        }
-        .app-name:focus {
-            border-bottom-color: var(--accent-color);
         }
 
         .theme-toggle {
@@ -475,7 +447,7 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Predefined Trips Selector - GENERIC LABEL */
+        /* Predefined Trips Selector - NEW */
         .predefined-trips-group {
             margin: var(--spacing-lg) 0;
             padding: var(--spacing-md) 0;
@@ -701,7 +673,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
-        /* Settings Modal */
+        /* Settings Modal (unchanged) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1152,7 +1124,7 @@
         <div class="header">
             <div class="app-title">
                 <i class="fas fa-motorcycle motorcycle-icon"></i>
-                <div class="app-name" id="appName" contenteditable="true">Francine</div>
+                <div class="app-name" contenteditable="true">Francine</div>
             </div>
             <button class="theme-toggle" id="themeToggle">
                 <i class="fas fa-moon"></i>
@@ -1187,12 +1159,12 @@
                     </div>
                 </div>
 
-                <!-- GENERIC Predefined Trips Selector -->
+                <!-- NEW: Predefined Trips Selector -->
                 <div class="predefined-trips-group">
-                    <label for="tripSelect">Load a sample camping trip:</label>
+                    <label for="tripSelect">Load a predefined Tanay trip:</label>
                     <div class="trip-select-row">
                         <select id="tripSelect" class="form-control">
-                            <option value="">-- Select an example --</option>
+                            <option value="">-- Select a campsite --</option>
                         </select>
                         <button type="button" class="btn btn-secondary" id="loadTripBtn">
                             <i class="fas fa-download"></i> Load
@@ -1392,7 +1364,7 @@
                 <h3>Currency</h3>
                 <div class="currency-options">
                     <div class="currency-option">
-                        <button type="button" class="currency-btn" data-currency="₱">₱ PHP</button>
+                        <button type="button" class="currency-btn active" data-currency="₱">₱ PHP</button>
                     </div>
                     <div class="currency-option">
                         <button type="button" class="currency-btn" data-currency="$">$ USD</button>
@@ -1409,7 +1381,7 @@
             <div class="settings-group">
                 <h3>Decimal Places</h3>
                 <div class="decimal-options">
-                    <button type="button" class="decimal-btn" data-decimals="0">0 (₱ 1,234)</button>
+                    <button type="button" class="decimal-btn active" data-decimals="0">0 (₱ 1,234)</button>
                     <button type="button" class="decimal-btn" data-decimals="2">2 (₱ 1,234.56)</button>
                 </div>
             </div>
@@ -1445,7 +1417,7 @@
         <span id="toastMessage">Trip saved successfully!</span>
     </div>
 
-    <!-- PWA Installation Prompt (improved) -->
+    <!-- PWA Installation Prompt (optional) -->
     <div id="installPrompt" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--secondary-bg); color: var(--primary-text); padding: 15px; border-radius: var(--border-radius-card); box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10000; border: 1px solid var(--border-color); backdrop-filter: blur(10px);">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -1463,28 +1435,23 @@
     </div>
 
     <script>
-    // PWA Installation Prompt - improved with cooldown
+    // PWA Installation Prompt
     let deferredPrompt;
     const installPrompt = document.getElementById('installPrompt');
     const installCancel = document.getElementById('installCancel');
     const installAccept = document.getElementById('installAccept');
 
     // Check if already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-    if (!isStandalone) {
-        // Check if user dismissed recently (within 7 days)
-        const lastDismissed = localStorage.getItem('installPromptDismissed');
-        const oneWeek = 7 * 24 * 60 * 60 * 1000;
-        const showPrompt = !lastDismissed || (Date.now() - parseInt(lastDismissed) > oneWeek);
+    if (!window.matchMedia('(display-mode: standalone)').matches && 
+        !window.navigator.standalone) {
         
-        if (showPrompt) {
-            setTimeout(() => {
-                installPrompt.style.display = 'block';
-            }, 5000);
-        }
+        // Show install prompt after delay
+        setTimeout(() => {
+            installPrompt.style.display = 'block';
+        }, 5000);
     }
 
+    // Handle install prompt
     installCancel.addEventListener('click', () => {
         installPrompt.style.display = 'none';
         localStorage.setItem('installPromptDismissed', Date.now());
@@ -1501,16 +1468,18 @@
         localStorage.setItem('installPromptAccepted', Date.now());
     });
 
+    // Save beforeinstallprompt event
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        // Only show if not already dismissed recently
-        const lastDismissed = localStorage.getItem('installPromptDismissed');
-        const oneWeek = 7 * 24 * 60 * 60 * 1000;
-        if (!lastDismissed || (Date.now() - parseInt(lastDismissed) > oneWeek)) {
-            installPrompt.style.display = 'block';
-        }
+        installPrompt.style.display = 'block';
     });
+
+    // Show instructions for iOS
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.navigator.standalone) {
+        console.log('iOS detected - show install instructions');
+        // You could show iOS-specific instructions here
+    }
 
     // ---------- APP STATE ----------
     const state = {
@@ -1520,16 +1489,57 @@
         history: []
     };
 
-    // ---------- SAMPLE TRIPS (easily modifiable, generic) ----------
-    const sampleTrips = [
-        { name: "River Ranch PH (Tanay)", campsiteFee: 800, foodCost: 150, environmentalFee: 0 },
-        { name: "Bulod Campsite (Daraitan, Tanay)", campsiteFee: 300, foodCost: 150, environmentalFee: 0 },
-        { name: "Camp Irog Daraitan (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 0 },
-        { name: "Daranak/Batlag Falls area (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 50 },
-        { name: "Atburan Camping Ground (Tanay)", campsiteFee: 300, foodCost: 150, environmentalFee: 0 },
-        { name: "Luklukan Camp and Chill (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 0 },
-        { name: "Blessed HM Campsite (Tanay)", campsiteFee: 500, foodCost: 150, environmentalFee: 0 },
-        { name: "Camp Majai Riverfront (Tanay)", campsiteFee: 400, foodCost: 150, environmentalFee: 0 }
+    // ---------- PREDEFINED TRIPS (from your list) ----------
+    const predefinedTrips = [
+        {
+            name: "River Ranch PH (Barangay Cayabu, Tanay)",
+            campsiteFee: 800,
+            foodCost: 150,
+            environmentalFee: 0,
+            description: "Remote valley in Sierra Madre mountains with direct river access"
+        },
+        {
+            name: "Bulod Campsite (Daraitan, Tanay)",
+            campsiteFee: 300,
+            foodCost: 150,
+            environmentalFee: 0
+        },
+        {
+            name: "Camp Irog Daraitan (across Agos River, Daraitan, Tanay)",
+            campsiteFee: 400,
+            foodCost: 150,
+            environmentalFee: 0
+        },
+        {
+            name: "Daranak/Batlag Falls area campsites (Tanay, near the falls)",
+            campsiteFee: 400,
+            foodCost: 150,
+            environmentalFee: 50      // entrance to falls
+        },
+        {
+            name: "Atburan Camping Ground (Sitio Atburan, Tanay)",
+            campsiteFee: 300,
+            foodCost: 150,
+            environmentalFee: 0
+        },
+        {
+            name: "Luklukan Camp and Chill (Tanay)",
+            campsiteFee: 400,
+            foodCost: 150,
+            environmentalFee: 0
+        },
+        {
+            name: "Blessed HM Campsite (Brgy. Laiban, Tanay)",
+            campsiteFee: 500,
+            foodCost: 150,
+            environmentalFee: 0
+        },
+        {
+            name: "Camp Majai Riverfront (Tanay area)",
+            campsiteFee: 400,
+            foodCost: 150,
+            environmentalFee: 0
+        }
     ];
 
     // DOM Elements
@@ -1565,22 +1575,14 @@
     const foodCostInput = document.getElementById('foodCost');
     const miscCostInput = document.getElementById('miscCost');
     const fuelEfficiencyInput = document.getElementById('fuelEfficiency');
-    const appNameDiv = document.getElementById('appName');
 
-    // Trip selector elements
+    // NEW: Trip selector elements
     const tripSelect = document.getElementById('tripSelect');
     const loadTripBtn = document.getElementById('loadTripBtn');
 
     // Initialize the app
     function init() {
-        // Load saved app name
-        const savedAppName = localStorage.getItem('appName');
-        if (savedAppName) appNameDiv.textContent = savedAppName;
-        appNameDiv.addEventListener('input', () => {
-            localStorage.setItem('appName', appNameDiv.textContent);
-        });
-
-        // Populate the sample trip dropdown
+        // Populate the trip dropdown
         populateTripSelect();
 
         // Set default date to today
@@ -1607,9 +1609,9 @@
         setupEventListeners();
     }
 
-    // Populate the sample trips dropdown
+    // Populate the predefined trips dropdown
     function populateTripSelect() {
-        sampleTrips.forEach(trip => {
+        predefinedTrips.forEach(trip => {
             const option = document.createElement('option');
             option.value = trip.name;
             option.textContent = trip.name;
@@ -1617,14 +1619,14 @@
         });
     }
 
-    // Load selected sample trip into the form
-    function loadSampleTrip() {
+    // Load selected predefined trip into the form
+    function loadPredefinedTrip() {
         const selectedName = tripSelect.value;
         if (!selectedName) {
             showToast('Please select a trip');
             return;
         }
-        const trip = sampleTrips.find(t => t.name === selectedName);
+        const trip = predefinedTrips.find(t => t.name === selectedName);
         if (!trip) return;
 
         // Set description
@@ -1635,7 +1637,7 @@
         foodCostInput.value = trip.foodCost;
         environmentalFeeInput.value = trip.environmentalFee;
 
-        // Reset fields that are not part of the sample breakdown
+        // Reset fields that are not part of the predefined breakdown
         tentRentalInput.value = 0;
         parkingFeeInput.value = 0;
         miscCostInput.value = 0;
@@ -1659,6 +1661,22 @@
         // Copy modal
         closeCopyModalBtns.forEach(btn => btn.addEventListener('click', () => toggleModal(copyModal, false)));
         copyToClipboardBtn.addEventListener('click', copyToClipboard);
+        
+        // Currency selection
+        currencyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currencyBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        
+        // Decimal selection
+        decimalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                decimalBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
         
         // Save trip
         saveBtn.addEventListener('click', saveTrip);
@@ -1686,8 +1704,8 @@
             }
         });
 
-        // Load trip button
-        loadTripBtn.addEventListener('click', loadSampleTrip);
+        // NEW: Load trip button
+        loadTripBtn.addEventListener('click', loadPredefinedTrip);
     }
 
     // Toggle theme
@@ -1717,24 +1735,8 @@
     function toggleModal(modal, show) {
         if (show) {
             if (modal === settingsModal) {
-                // Load current fuel efficiency
+                // Load current fuel efficiency into settings modal
                 fuelEfficiencyInput.value = state.fuelEfficiency;
-
-                // Set active currency button
-                currencyBtns.forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.currency === state.currency) {
-                        btn.classList.add('active');
-                    }
-                });
-
-                // Set active decimal button
-                decimalBtns.forEach(btn => {
-                    btn.classList.remove('active');
-                    if (parseInt(btn.dataset.decimals) === state.decimals) {
-                        btn.classList.add('active');
-                    }
-                });
             }
             modal.classList.add('active');
         } else {
@@ -1750,10 +1752,22 @@
         
         if (savedCurrency) {
             state.currency = savedCurrency;
+            currencyBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.currency === savedCurrency) {
+                    btn.classList.add('active');
+                }
+            });
         }
         
         if (savedDecimals !== null) {
             state.decimals = parseInt(savedDecimals);
+            decimalBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.dataset.decimals) === state.decimals) {
+                    btn.classList.add('active');
+                }
+            });
         }
         
         if (savedFuelEfficiency !== null) {
@@ -2135,18 +2149,30 @@
     // Initialize the app when DOM is loaded
     document.addEventListener('DOMContentLoaded', init);
 
-    // Service Worker Registration
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(function(registration) {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                })
-                .catch(function(error) {
-                    console.log('Service Worker registration failed:', error);
-                });
-        });
-    }
+    // Add Service Worker Registration at the end of your existing script
+    document.addEventListener('DOMContentLoaded', function() {
+        // Your existing init() call
+        init();
+        
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+        
+        // Detect if running as standalone PWA
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+            console.log('Running as PWA');
+        }
+    });
     </script>
 </body>
 </html>
